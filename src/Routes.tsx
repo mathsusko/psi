@@ -1,0 +1,55 @@
+import { createBrowserRouter } from 'react-router-dom'
+
+import { SignIn } from './pages/auth/sign-in'
+import { SignUp } from './pages/auth/sign-up'
+import { AppLayout } from './pages/_layouts/app'
+import { AuthLayout } from './pages/_layouts/auth'
+import { Estoque } from './pages/app/estoque/estoque'
+import { Dashboard } from './pages/app/dashboard/dashboard'
+import { NotFound } from './pages/app/404'
+import { AddPecaPorKilo } from './pages/app/estoque/add-peca-por-kilo'
+import { AddPecaPorMetro } from './pages/app/estoque/add-peca-por-metragem'
+import { AddPecaPorQtd } from './pages/app/estoque/add-peca-por-qtd'
+import { EditPecaPorQtd } from './pages/app/estoque/edit-peca-por-qtd'
+import { OrcamentoDeMateriaisLista } from './pages/app/orcamentos/orcamentos-de-materiais-lista'
+import { OrcamentoDeServicosLista } from './pages/app/orcamentos/orcamentos-de-servicos-lista'
+import { GerarOrcamentoMateriais } from './pages/app/orcamentos/gerar-orcmaneto-materias'
+import { PrevisualizacaoOrcamentoDeMateriais } from './pages/app/orcamentos/previsualizacao-orcamento-material'
+import { GerarOrcamentoServicos } from './pages/app/orcamentos/gerar-orcmaneto-servicos'
+import { PrevisualizacaoOrcamentoDeServicos } from './pages/app/orcamentos/previsualizacao-orcamento-servicos'
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AppLayout />,
+    errorElement: <NotFound />,
+    children: [
+      { path: '/', element: <Dashboard /> },
+      { path: '/estoque', element: <Estoque /> },
+      { path: '/add-peca-por-kilo', element: <AddPecaPorKilo /> },
+      { path: '/add-peca-por-metro', element: <AddPecaPorMetro /> },
+      { path: '/add-peca-por-qtd', element: <AddPecaPorQtd /> },
+      { path: '/edit-peca-por-qtd', element: <EditPecaPorQtd /> },
+      { path: '/orcamentos-de-materiais', element: <OrcamentoDeMateriaisLista /> },
+      { path: '/orcamentos-de-servicos', element: <OrcamentoDeServicosLista /> },
+      { path: '/gerar-orcamento-materiais', element: <GerarOrcamentoMateriais /> },
+      { path: '/gerar-orcamento-servicos', element: <GerarOrcamentoServicos /> },
+      {
+        path: '/previsualizacao-orcamento-materiais',
+        element: <PrevisualizacaoOrcamentoDeMateriais />
+      },
+      {
+        path: '/previsualizacao-orcamento-servicos',
+        element: <PrevisualizacaoOrcamentoDeServicos />
+      }
+    ]
+  },
+  {
+    path: '/',
+    element: <AuthLayout />,
+    children: [
+      { path: '/sign-in', element: <SignIn /> },
+      { path: '/sign-up', element: <SignUp /> }
+    ]
+  }
+])

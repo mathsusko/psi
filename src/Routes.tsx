@@ -17,6 +17,11 @@ import { GerarOrcamentoMateriais } from './pages/app/orcamentos/gerar-orcmaneto-
 import { PrevisualizacaoOrcamentoDeMateriais } from './pages/app/orcamentos/previsualizacao-orcamento-material'
 import { GerarOrcamentoServicos } from './pages/app/orcamentos/gerar-orcmaneto-servicos'
 import { PrevisualizacaoOrcamentoDeServicos } from './pages/app/orcamentos/previsualizacao-orcamento-servicos'
+import { NotasFiscaisLista } from './pages/app/notafiscal/notas-fiscais-lista'
+import { GerarNotaFiscalOne } from './pages/app/notafiscal/gerar-nota-fiscal-one'
+import { GerarNotaFiscalTwo } from './pages/app/notafiscal/gerar-nota-fiscal-two'
+import { GerarNotaFiscalThree } from './pages/app/notafiscal/gerar-nota-fiscal-three'
+import { PreviewNotaFiscal } from './pages/app/notafiscal/preview-nota-fiscal'
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +46,26 @@ export const router = createBrowserRouter([
       {
         path: '/previsualizacao-orcamento-servicos',
         element: <PrevisualizacaoOrcamentoDeServicos />
+      },
+      {
+        path: '/notas-fiscais-lista',
+        element: <NotasFiscaisLista />
+      },
+      {
+        path: '/gerar-nota-fiscal-one',
+        element: <GerarNotaFiscalOne />
+      },
+      {
+        path: '/gerar-nota-fiscal-two',
+        element: <GerarNotaFiscalTwo />
+      },
+      {
+        path: '/gerar-nota-fiscal-three',
+        element: <GerarNotaFiscalThree />
+      },
+      {
+        path: '/preview-nota-fiscal',
+        element: <PreviewNotaFiscal />
       }
     ]
   },

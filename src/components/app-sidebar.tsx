@@ -92,7 +92,7 @@ const data = {
     },
     {
       title: 'Nota fiscal',
-      url: '#',
+      url: '/notas-fiscais-lista',
       icon: FileCheck
     },
     {

@@ -22,6 +22,9 @@ import { GerarNotaFiscalOne } from './pages/app/notafiscal/gerar-nota-fiscal-one
 import { GerarNotaFiscalTwo } from './pages/app/notafiscal/gerar-nota-fiscal-two'
 import { GerarNotaFiscalThree } from './pages/app/notafiscal/gerar-nota-fiscal-three'
 import { PreviewNotaFiscal } from './pages/app/notafiscal/preview-nota-fiscal'
+import { CategoriaPage } from './pages/app/estoque/[categoria]'
+import { NovaCategoriaPage } from './pages/app/estoque/nova-categoria'
+import { EditarCategoriaPage } from './pages/app/estoque/editar/[id]'
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +34,18 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <Dashboard /> },
       { path: '/estoque', element: <Estoque /> },
+      {
+        path: '/app/estoque/nova-categoria',
+        element: <NovaCategoriaPage />
+      },
+      {
+        path: '/app/estoque/:tipo/:slug',
+        element: <CategoriaPage />
+      },
+      {
+        path: '/app/estoque/editar/:id',
+        element: <EditarCategoriaPage />
+      },
       { path: '/add-peca-por-kilo', element: <AddPecaPorKilo /> },
       { path: '/add-peca-por-metro', element: <AddPecaPorMetro /> },
       { path: '/add-peca-por-qtd', element: <AddPecaPorQtd /> },

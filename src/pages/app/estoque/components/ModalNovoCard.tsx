@@ -1,11 +1,10 @@
-// src/pages/app/estoque/components/ModalNovoCard.tsx
+import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { useState } from 'react'
-import { Button } from 'react-day-picker'
+import { Button } from '@/components/ui/button' // ⚠️ garantir que esse Button é do seu design system
 import { useCardsEstoque } from '../../../../hooks/useCardsEstoque'
 
-export function ModalNovoCard() {
+export function ModalNovoCard({ open, onOpenChange }: { open: boolean, onOpenChange: (v: boolean) => void }) {
   const [nome, setNome] = useState('')
   const [imagem, setImagem] = useState<File | null>(null)
   const { criarCard } = useCardsEstoque()
@@ -13,13 +12,16 @@ export function ModalNovoCard() {
   const handleSubmit = async () => {
     if (!nome || !imagem) return
     await criarCard({ nome, imagem })
-    // Fecha o modal e atualiza a lista
+    setNome('')
+    setImagem(null)
+    onOpenChange(false) // fecha o modal
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <Input
+          placeholder="Nome do card"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
         />

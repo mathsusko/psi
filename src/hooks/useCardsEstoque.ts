@@ -21,3 +21,16 @@ export function useCardsEstoque() {
 
   return { cards, criarCard, isLoading, isError }
 }
+
+export function useDeleteCardEstoque() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return await CardEstoqueService.deletar(id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cards-estoque'] })
+    },
+  })
+} 

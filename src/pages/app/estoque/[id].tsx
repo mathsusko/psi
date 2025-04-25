@@ -10,38 +10,35 @@ import { ModalNovoItem } from './components/ModalNovoItem'
 import { EditIcon, TrashIcon } from 'lucide-react'
 
 export default function ItensDoCardPage() {
-  const { id } = useParams()  // Verifique se o 'id' é corretamente extraído da URL
+  const { id } = useParams()
   const navigate = useNavigate()
   const [openModal, setOpenModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [itemToEdit, setItemToEdit] = useState<any>(null)
-  const { data: itens, isLoading, isError } = useItensDoCard(id!) // Asegure-se de que o 'id' não está sendo passado como undefined
+  const { data: itens, isLoading, isError } = useItensDoCard(id!)
   const queryClient = useQueryClient()
 
-  // Função para editar o item
   const handleEditItem = (item: any) => {
     setItemToEdit(item)
     setOpenEditModal(true)
   }
 
-  // Função para deletar o item
   const { mutate: deletarItem } = useMutation({
     mutationFn: (itemId: string) => CardEstoqueService.deletarItem(id!, itemId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['itens-card', id]) // Invalida a query para recarregar os dados
+      queryClient.invalidateQueries(['itens-card', id])
     },
   })
 
-  // Função para adicionar um novo item
   const handleAddItem = async (newItem: any) => {
     try {
       if (!id) {
         alert("ID do card não encontrado.")
         return
       }
-      await CardEstoqueService.criarItem(id!, newItem) // Passando o cardId para a criação do item
-      queryClient.invalidateQueries(['itens-card', id]) // Atualiza a lista de itens
-      setOpenModal(false) // Fecha o modal após adicionar
+      await CardEstoqueService.criarItem(id, newItem)
+      queryClient.invalidateQueries(['itens-card', id])
+      setOpenModal(false)
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
     }
@@ -61,7 +58,7 @@ export default function ItensDoCardPage() {
             Voltar
           </Button>
           <Button
-            onClick={() => setOpenModal(true)} // Abre o modal para adicionar item
+            onClick={() => setOpenModal(true)}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             + Adicionar Linha à tabela
@@ -97,19 +94,17 @@ export default function ItensDoCardPage() {
                 <TableCell>R$ {item.custoTotal?.toFixed(2)}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    {/* Botão Editar */}
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleEditItem(item)} // Ao clicar no botão de editar
+                      onClick={() => handleEditItem(item)}
                     >
                       <EditIcon />
                     </Button>
-                    {/* Botão Deletar */}
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => deletarItem(item._id)} // Ao clicar no botão de deletar
+                      onClick={() => deletarItem(item.cardId, item._id)}
                     >
                       <TrashIcon />
                     </Button>
@@ -121,19 +116,17 @@ export default function ItensDoCardPage() {
         </Table>
       </div>
 
-      {/* Modal de Edição */}
       <ModalEditarItem
         open={openEditModal}
         onOpenChange={setOpenEditModal}
         item={itemToEdit}
-        onSave={() => queryClient.invalidateQueries(['itens-card', id])}  // Revalidando a query após edição
+        onSave={() => queryClient.invalidateQueries(['itens-card', id])}
       />
 
-      {/* Modal de Adicionar Item */}
       <ModalNovoItem
         open={openModal}
         onOpenChange={setOpenModal}
-        onSave={handleAddItem}  // Passando a função para adicionar o item
+        cardId={id!}
       />
     </div>
   )

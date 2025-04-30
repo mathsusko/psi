@@ -81,6 +81,7 @@ export default function ItensDoCardPage() {
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
+          
           <TableBody>
             {itens?.map((item) => (
               <TableRow key={item._id}>
@@ -104,7 +105,7 @@ export default function ItensDoCardPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => deletarItem(item.cardId, item._id)}
+                      onClick={() => deletarItem(item._id)} // Passa apenas o _id do item
                     >
                       <TrashIcon />
                     </Button>

@@ -23,6 +23,11 @@ import { GerarNotaFiscalTwo } from './pages/app/notafiscal/gerar-nota-fiscal-two
 import { GerarNotaFiscalThree } from './pages/app/notafiscal/gerar-nota-fiscal-three'
 import { PreviewNotaFiscal } from './pages/app/notafiscal/preview-nota-fiscal'
 import ItensDoCardPage from './pages/app/estoque/[id]'
+import Clientes from './pages/app/clientes/clientes'
+import Cliente from './pages/app/clientes/paginaCliente/[id]'
+import Orcamento from './pages/app/clientes/paginaCliente/orcamento'
+import NotasFiscais from './pages/app/clientes/paginaCliente/notasFiscais'
+import DadosDaEmpresa from './pages/app/clientes/paginaCliente/dadosDaEmpresa'
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +42,16 @@ export const router = createBrowserRouter([
         element: <ItensDoCardPage />
       },
       { path: '/add-peca-por-kilo', element: <AddPecaPorKilo /> },
+      { path: '/clientes', element: <Clientes /> },
+      {
+        path: '/clientes/:id',
+        element: <Cliente />, // Perfil do cliente
+        children: [
+          { path: 'orcamento', element: <Orcamento /> }, // Exibe orçamentos
+          { path: 'notas-fiscais', element: <NotasFiscais /> }, // Exibe notas fiscais
+          { path: 'dados-da-empresa', element: <DadosDaEmpresa /> } // Exibe dados da empresa
+        ]
+      },
       { path: '/add-peca-por-metro', element: <AddPecaPorMetro /> },
       { path: '/add-peca-por-qtd', element: <AddPecaPorQtd /> },
       { path: '/edit-peca-por-qtd', element: <EditPecaPorQtd /> },

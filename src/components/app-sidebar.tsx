@@ -10,7 +10,8 @@ import {
   FileCheck,
   GalleryVerticalEnd,
   Settings2,
-  SquareTerminal
+  SquareTerminal,
+  UsersRound
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -94,6 +95,11 @@ const data = {
       title: 'Nota fiscal',
       url: '/notas-fiscais-lista',
       icon: FileCheck
+    },
+    {
+      title: 'Clientes',
+      url: '/clientes',
+      icon: UsersRound
     },
     {
       title: 'Controle de Funcionário',

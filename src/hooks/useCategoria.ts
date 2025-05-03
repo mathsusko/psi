@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCardsEstoque } from '@/hooks/useCardsEstoque'
+import axios from 'axios' // Importar axios para fazer a requisição à API
 
 interface MaterialData {
   codigo: string
@@ -20,9 +21,11 @@ export function useCategoria() {
     precoTotal: '',
     imagem: ''
   })
+  const [filteredCards, setFilteredCards] = useState<any[]>([])
+  const [medidas, setMedidas] = useState<string[]>([]) // Estado para armazenar as medidas
+  const [loadingMedidas, setLoadingMedidas] = useState(false) // Estado para controlar o carregamento das medidas
 
   const { cards } = useCardsEstoque() // Hook para pegar os cards
-  const [filteredCards, setFilteredCards] = useState<any[]>([])
 
   // Filtrando os cards conforme a categoria selecionada
   useEffect(() => {
@@ -31,6 +34,20 @@ export function useCategoria() {
       setFilteredCards(filtered)
     }
   }, [selectedCategoria, cards])
+
+  // Função para buscar as medidas na API
+  const fetchMedidas = async (cardId: string) => {
+    setLoadingMedidas(true)
+    try {
+      const response = await axios.get(`http://localhost:3333/api/cards/${cardId}/itens`)
+      const medidas = response.data.map((item: any) => item.medida) // Assume que a API retorna os itens com a propriedade "medida"
+      setMedidas(medidas)
+    } catch (error) {
+      console.error('Erro ao carregar medidas:', error)
+    } finally {
+      setLoadingMedidas(false)
+    }
+  }
 
   // Função para atualizar a categoria selecionada
   const handleCategoriaChange = (categoria: string) => {
@@ -49,6 +66,14 @@ export function useCategoria() {
             ? '/images/kg.jpg'
             : '/images/metro.jpg' // Exemplo de imagens para cada categoria
     })
+
+    // Se a categoria selecionada for válida, buscar as medidas do card
+    if (categoria === 'Material por Kg' || categoria === 'Material por Metros') {
+      const selectedCard = filteredCards.find((card) => card.categoria === categoria)
+      if (selectedCard) {
+        fetchMedidas(selectedCard._id)
+      }
+    }
   }
 
   // Função para atualizar os dados do material selecionado
@@ -59,6 +84,8 @@ export function useCategoria() {
       nome: card.nome,
       imagem: card.imagemUrl // Atualiza a imagem com a URL do card
     })
+    // Após selecionar um material, buscar as medidas
+    fetchMedidas(card._id)
   }
 
   return {
@@ -67,6 +94,8 @@ export function useCategoria() {
     materialData,
     setMaterialData,
     filteredCards,
+    medidas,
+    loadingMedidas,
     handleCategoriaChange,
     handleMaterialChange
   }

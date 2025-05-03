@@ -23,6 +23,7 @@ export default function Estoque() {
             id={card._id}
             nome={card.nome}
             imagemUrl={`http://localhost:3333${card.imagemUrl}`}
+            categoria={card.categoria}
           />
         ))}
       </div>

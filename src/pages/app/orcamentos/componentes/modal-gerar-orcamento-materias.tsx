@@ -23,6 +23,8 @@ export function DialogAddMateriais() {
     selectedCategoria,
     materialData,
     filteredCards,
+    medidas,
+    loadingMedidas,
     handleCategoriaChange,
     handleMaterialChange
   } = useCategoria() // Usando o hook para gerenciar categoria e materiais
@@ -42,15 +44,14 @@ export function DialogAddMateriais() {
             {/* Verificar se a imagem foi carregada */}
             {materialData.imagem ? (
               <img
-                src={`http://localhost:3333${materialData.imagem}`} // Garantir que o caminho da imagem seja absoluto
-                alt={materialData.nome || 'Imagem do material'} // Se não houver nome, usa 'Imagem do material'
+                src={`http://localhost:3333${materialData.imagem}`}
+                alt={materialData.nome || 'Imagem do material'}
                 className="w-[227px] h-[227px] object-contain border border-sidebar rounded-sm"
               />
             ) : (
-              // Skeleton Loader exibido até a imagem ser carregada
               <Skeleton
                 className="w-[227px] h-[227px] bg-gray-300 rounded-sm"
-                alt="Carregando imagem..." // Aqui você coloca uma descrição alternativa
+                alt="Carregando imagem..."
               />
             )}
           </div>
@@ -63,8 +64,7 @@ export function DialogAddMateriais() {
             </label>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-                {materialData.nome || 'Escolha um material'}{' '}
-                {/* Exibe o nome do material selecionado */}
+                {materialData.nome || 'Escolha um material'}
                 <ChevronDown size="16" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -76,7 +76,7 @@ export function DialogAddMateriais() {
                     <DropdownMenuItem
                       key={card._id}
                       className="p-2 rounded-md"
-                      onClick={() => handleMaterialChange(card)} // Passa o card inteiro ao selecionar
+                      onClick={() => handleMaterialChange(card)}
                     >
                       <span>{card.nome}</span>
                     </DropdownMenuItem>
@@ -94,46 +94,67 @@ export function DialogAddMateriais() {
           </div>
         </div>
 
-        {/* Campos de entrada como medida, preço etc. */}
-        <div className="flex gap-2 w-full mb-4">
-          <div className="space-y-2 w-full">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="medida"
+        <div className="space-y-2 w-full mb-4">
+          <label
+            className="text-sm font-medium text-gray-700"
+            htmlFor="medida"
+          >
+            Medida
+          </label>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
+              {materialData.medida || 'Escolha uma medida'}{' '}
+              {/* Atualiza o trigger com a medida selecionada */}
+              <ChevronDown size="16" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="p-2 border rounded-md bg-sidebar"
             >
-              Medida
-            </label>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-                Escolha uma medida
-                <ChevronDown size="16" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="p-2 border rounded-md bg-sidebar"
-              >
-                <DropdownMenuItem className="p-2 rounded-md">2/3</DropdownMenuItem>
-                <DropdownMenuItem className="p-2 rounded-md">10</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+              {loadingMedidas ? (
+                <DropdownMenuItem
+                  disabled
+                  className="p-2 rounded-md"
+                >
+                  Carregando medidas...
+                </DropdownMenuItem>
+              ) : medidas.length > 0 ? (
+                medidas.map((medida, index) => (
+                  <DropdownMenuItem
+                    key={index}
+                    className="p-2 rounded-md"
+                    onClick={() => setMaterialData({ ...materialData, medida: medida })}
+                  >
+                    {medida} {/* Exibe a medida selecionada */}
+                  </DropdownMenuItem>
+                ))
+              ) : (
+                <DropdownMenuItem
+                  disabled
+                  className="p-2 rounded-md"
+                >
+                  Nenhuma medida disponível
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
-          <div className="space-y-2 w-full mb-4">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="medida"
-            >
-              Quantidade
-            </label>
-            <Input
-              id="medida"
-              value={materialData.medida}
-              onChange={(e) =>
-                setMaterialData({ ...materialData, medida: e.target.value })
-              }
-              placeholder="10"
-            />
-          </div>
+        <div className="space-y-2 w-full mb-4">
+          <label
+            className="text-sm font-medium text-gray-700"
+            htmlFor="quantidade"
+          >
+            Quantidade
+          </label>
+          <Input
+            id="quantidade"
+            value={materialData.quantidade}
+            onChange={(e) =>
+              setMaterialData({ ...materialData, quantidade: e.target.value })
+            }
+            placeholder="10"
+          />
         </div>
 
         <div className="flex gap-2 w-full mb-4">
@@ -185,7 +206,6 @@ export function DialogAddMateriais() {
       </DialogHeader>
 
       <form className="grid gap-4 py-4">
-        {/* Dropdown para escolher categoria */}
         <DropdownMenu>
           <DropdownMenuTrigger className="flex justify-between w-[200px] items-center p-2 border rounded-md">
             {selectedCategoria ? selectedCategoria : 'Escolha uma categoria'}
@@ -218,7 +238,6 @@ export function DialogAddMateriais() {
 
         <Separator className="bg-sidebar border-b" />
 
-        {/* Renderizando os campos baseados na categoria */}
         <div className="flex flex-col gap-2">{renderFieldsByCategory()}</div>
 
         <div className="flex justify-end pt-4">

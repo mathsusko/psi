@@ -52,14 +52,13 @@ export function useCategoria() {
   }
 
   // Função para atualizar os dados do material selecionado
-  const handleMaterialChange = (materialId: string) => {
-    const selectedCard = filteredCards.find((card) => card._id === materialId)
-    if (selectedCard) {
-      setMaterialData({
-        ...materialData,
-        imagem: selectedCard.imagemUrl // Atualiza a imagem com a URL do card
-      })
-    }
+  const handleMaterialChange = (card: any) => {
+    setMaterialData({
+      ...materialData,
+      id: card._id,
+      nome: card.nome,
+      imagem: card.imagemUrl // Atualiza a imagem com a URL do card
+    })
   }
 
   return {

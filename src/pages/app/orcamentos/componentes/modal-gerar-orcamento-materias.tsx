@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import {
   DialogHeader,
   DialogContent,
@@ -41,13 +42,16 @@ export function DialogAddMateriais() {
             {/* Verificar se a imagem foi carregada */}
             {materialData.imagem ? (
               <img
-                src={materialData.imagem}
-                alt=""
+                src={`http://localhost:3333${materialData.imagem}`} // Garantir que o caminho da imagem seja absoluto
+                alt={materialData.nome || 'Imagem do material'} // Se não houver nome, usa 'Imagem do material'
                 className="w-[227px] h-[227px] object-contain border border-sidebar rounded-sm"
               />
             ) : (
               // Skeleton Loader exibido até a imagem ser carregada
-              <Skeleton className="w-[227px] h-[227px] bg-gray-300 rounded-sm" />
+              <Skeleton
+                className="w-[227px] h-[227px] bg-gray-300 rounded-sm"
+                alt="Carregando imagem..." // Aqui você coloca uma descrição alternativa
+              />
             )}
           </div>
           <div className="space-y-2 w-[227px]">
@@ -59,7 +63,8 @@ export function DialogAddMateriais() {
             </label>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-                Escolha um material
+                {materialData.nome || 'Escolha um material'}{' '}
+                {/* Exibe o nome do material selecionado */}
                 <ChevronDown size="16" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -71,7 +76,7 @@ export function DialogAddMateriais() {
                     <DropdownMenuItem
                       key={card._id}
                       className="p-2 rounded-md"
-                      onClick={() => handleMaterialChange(card._id)} // Ao selecionar material, muda os dados
+                      onClick={() => handleMaterialChange(card)} // Passa o card inteiro ao selecionar
                     >
                       <span>{card.nome}</span>
                     </DropdownMenuItem>

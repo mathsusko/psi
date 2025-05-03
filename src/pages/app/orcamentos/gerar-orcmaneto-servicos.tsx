@@ -12,7 +12,7 @@ import {
 import { Eye, Download, Trash, Delete, Edit, Plus } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { NavLink } from 'react-router-dom'
-import { DialogAddMateriais } from './modal-gerar-orcamento-materias'
+import { DialogAddMateriais } from './componentes/modal-gerar-orcamento-materias'
 import { Textarea } from '@/components/ui/textarea'
 
 export function GerarOrcamentoServicos() {

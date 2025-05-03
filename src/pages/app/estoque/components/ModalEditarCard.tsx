@@ -1,69 +1,97 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { useCardsEstoque } from '@/hooks/useCardsEstoque'
 
 interface ModalEditarCardProps {
   open: boolean
   onOpenChange: (v: boolean) => void
+  id: string
   nome: string
   imagemUrl: string
-  onSave: (nome: string, imagem?: File) => void
 }
 
-const ModalEditarCard: React.FC<ModalEditarCardProps> = ({
+const ModalEditarCard = ({
   open,
   onOpenChange,
+  id,
   nome,
-  imagemUrl,
-  onSave,
-}) => {
+  imagemUrl
+}: ModalEditarCardProps) => {
   const [novoNome, setNovoNome] = useState(nome)
   const [novaImagem, setNovaImagem] = useState<File | null>(null)
 
-  const handleSubmit = () => {
-    if (!novoNome) return
-    onSave(novoNome, novaImagem || undefined)
-    onOpenChange(false)
+  const { editarCard } = useCardsEstoque()
+
+  useEffect(() => {
+    setNovoNome(nome)
+  }, [nome])
+
+  const handleSubmit = async () => {
+    if (!novoNome) {
+      console.error('Nome não pode estar vazio!')
+      alert('Nome não pode estar vazio!')
+      return
+    }
+
+    const updatedCard = {
+      nome: novoNome, // Nome atualizado
+      imagem: novaImagem || imagemUrl // Se não houver nova imagem, usa a imagem atual
+    }
+
+    try {
+      await editarCard(id, updatedCard) // Passa o ID e os dados para a função editar
+      onOpenChange(false) // Fecha o modal após sucesso
+    } catch (error) {
+      console.error('Erro ao editar card:', error)
+      alert('Erro ao editar card. Tente novamente.')
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-4">
-        <h2 className="text-lg font-semibold">Editar Card</h2>
-
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <DialogContent>
+        <DialogTitle>Editar Card</DialogTitle>
         <div className="mt-4">
-          <label htmlFor="nome" className="block text-sm font-medium text-gray-700">
-            Nome:
-          </label>
+          <label htmlFor="nome">Nome:</label>
           <Input
             id="nome"
-            placeholder="Nome do card"
             value={novoNome}
             onChange={(e) => setNovoNome(e.target.value)}
-            className="mt-2"
           />
         </div>
 
         <div className="mt-4">
-          <label htmlFor="imagem" className="block text-sm font-medium text-gray-700">
-            Imagem:
-          </label>
+          <label htmlFor="categoria">Categoria:</label>
+          <Input
+            id="categoria"
+            value="Un" // Categoria fixa
+            readOnly
+            disabled
+          />
+        </div>
+
+        <div className="mt-4">
+          <label htmlFor="imagem">Imagem:</label>
           <Input
             id="imagem"
             type="file"
             onChange={(e) => setNovaImagem(e.target.files?.[0] || null)}
-            className="mt-2"
           />
         </div>
 
         <div className="mt-4 flex justify-end gap-2">
-          <Button onClick={() => onOpenChange(false)} variant="secondary">
+          <Button
+            onClick={() => onOpenChange(false)}
+            variant="secondary"
+          >
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} className="bg-blue-600 text-white">
-            Salvar
-          </Button>
+          <Button onClick={handleSubmit}>Salvar</Button>
         </div>
       </DialogContent>
     </Dialog>

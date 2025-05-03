@@ -25,8 +25,6 @@ export default function Estoque() {
             imagemUrl={`http://localhost:3333${card.imagemUrl}`}
           />
         ))}
-
-  
       </div>
 
       <ModalNovoCard

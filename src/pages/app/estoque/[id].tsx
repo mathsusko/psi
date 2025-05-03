@@ -1,46 +1,62 @@
-import { useState } from 'react'
+// src/pages/app/estoque/itensDoCardPage.tsx
+import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useItensDoCard } from '@/hooks/useItensDoCard'
+import { useItemCard } from '@/hooks/useItemCard'
 import { Button } from '@/components/ui/button'
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import CardEstoqueService from '@/api/card-estoque'
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell
+} from '@/components/ui/table'
+import { EditIcon, TrashIcon } from 'lucide-react'
 import { ModalEditarItem } from './components/ModalEditarItem'
 import { ModalNovoItem } from './components/ModalNovoItem'
-import { EditIcon, TrashIcon } from 'lucide-react'
 
 export default function ItensDoCardPage() {
-  const { id } = useParams()
+  const { id } = useParams() // Obtendo o ID do parâmetro da rota
   const navigate = useNavigate()
+
   const [openModal, setOpenModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [itemToEdit, setItemToEdit] = useState<any>(null)
-  const { data: itens, isLoading, isError } = useItensDoCard(id!)
-  const queryClient = useQueryClient()
+
+  // Verifique se o id está presente antes de passar para o hook
+  if (!id) {
+    return <div>Erro: ID do card não encontrado.</div> // Exibe um erro se o id não for encontrado
+  }
+
+  const { itens, isLoading, isError, criarItem, editarItem, deletarItem, queryClient } =
+    useItemCard(id) // Passando o ID validado para o hook
 
   const handleEditItem = (item: any) => {
     setItemToEdit(item)
     setOpenEditModal(true)
   }
 
-  const { mutate: deletarItem } = useMutation({
-    mutationFn: (itemId: string) => CardEstoqueService.deletarItem(id!, itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['itens-card', id])
-    },
-  })
-
   const handleAddItem = async (newItem: any) => {
     try {
       if (!id) {
-        alert("ID do card não encontrado.")
+        alert('ID do card não encontrado.')
         return
       }
-      await CardEstoqueService.criarItem(id, newItem)
-      queryClient.invalidateQueries(['itens-card', id])
+      await criarItem({ cardId: id, itemData: newItem })
       setOpenModal(false)
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
+    }
+  }
+
+  const handleDeleteItem = async (itemId: string) => {
+    try {
+      if (id) {
+        await deletarItem({ cardId: id, itemId })
+        queryClient.invalidateQueries(['itens-card', id])
+      }
+    } catch (error) {
+      console.error('Erro ao excluir item:', error)
     }
   }
 
@@ -54,7 +70,10 @@ export default function ItensDoCardPage() {
           {itens?.[0]?.cardNome ?? 'Itens do Card'}
         </h1>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => navigate('/estoque')}>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/estoque')}
+          >
             Voltar
           </Button>
           <Button
@@ -70,23 +89,21 @@ export default function ItensDoCardPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Descrição</TableHead>
+              <TableHead>Material</TableHead>
               <TableHead>Medida</TableHead>
               <TableHead>NCM/SH</TableHead>
               <TableHead>Cód. Fábrica</TableHead>
-              <TableHead>Quantidade</TableHead>
-              <TableHead>Preço Un.</TableHead>
+              <TableHead>Un/Qtd/Metros</TableHead>
+              <TableHead>Preço</TableHead>
               <TableHead>Custo Total</TableHead>
               <TableHead>Ações</TableHead>
             </TableRow>
           </TableHeader>
-          
+
           <TableBody>
             {itens?.map((item) => (
               <TableRow key={item._id}>
-                <TableCell>{item.codigo}</TableCell>
-                <TableCell>{item.descricao}</TableCell>
+                <TableCell>{item.materialName}</TableCell>
                 <TableCell>{item.medida}</TableCell>
                 <TableCell>{item.ncm}</TableCell>
                 <TableCell>{item.codigoFabrica}</TableCell>
@@ -105,7 +122,7 @@ export default function ItensDoCardPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => deletarItem(item._id)} // Passa apenas o _id do item
+                      onClick={() => handleDeleteItem(item._id)}
                     >
                       <TrashIcon />
                     </Button>
@@ -127,9 +144,9 @@ export default function ItensDoCardPage() {
       <ModalNovoItem
         open={openModal}
         onOpenChange={setOpenModal}
-        cardId={id!}
+        cardId={id}
+        onSave={handleAddItem}
       />
     </div>
   )
 }
-  

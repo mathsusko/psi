@@ -1,92 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import CardEstoqueService from '@/api/card-estoque';
+import React, { useState, useEffect } from 'react'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { useItemCard } from '@/hooks/useItemCard'
+import { ItemData } from '@/api/ItemCardService'
 
 interface ModalEditarItemProps {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  item: any;
-  onSave: () => void;
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  item: ItemData | null
+  onSave: () => void
 }
 
 export function ModalEditarItem({
   open,
   onOpenChange,
   item,
-  onSave,
+  onSave
 }: ModalEditarItemProps) {
-  const [codigo, setCodigo] = useState(item?.codigo || '');
-  const [descricao, setDescricao] = useState(item?.descricao || '');
-  const [medida, setMedida] = useState(item?.medida || '');
-  const [ncm, setNcm] = useState(item?.ncm || '');
-  const [codigoFabrica, setCodigoFabrica] = useState(item?.codigoFabrica || '');
-  const [quantidade, setQuantidade] = useState(item?.quantidade || 0);
-  const [precoUnitario, setPrecoUnitario] = useState(item?.precoUnitario || 0);
+  if (!item) {
+    return (
+      <Dialog
+        open={open}
+        onOpenChange={onOpenChange}
+      >
+        <DialogContent>
+          <h2 className="text-lg font-semibold">Editar Item</h2>
+          <div className="mt-4 text-center text-red-500">Item não encontrado.</div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  const [codigo, setCodigo] = useState(item.codigo || '')
+  const [materialName, setmaterialName] = useState(item.materialName || '')
+  const [medida, setMedida] = useState(item.medida || '')
+  const [ncm, setNcm] = useState(item.ncm || '')
+  const [codigoFabrica, setCodigoFabrica] = useState(item.codigoFabrica || '')
+  const [quantidade, setQuantidade] = useState(item.quantidade || 0)
+  const [precoUnitario, setPrecoUnitario] = useState(item.precoUnitario || 0)
+
+  const { editarItem } = useItemCard(item.cardId)
 
   useEffect(() => {
     if (item) {
-      setCodigo(item.codigo);
-      setDescricao(item.descricao);
-      setMedida(item.medida);
-      setNcm(item.ncm);
-      setCodigoFabrica(item.codigoFabrica);
-      setQuantidade(item.quantidade);
-      setPrecoUnitario(item.precoUnitario);
+      setCodigo(item.codigo)
+      setmaterialName(item.materialName)
+      setMedida(item.medida)
+      setNcm(item.ncm)
+      setCodigoFabrica(item.codigoFabrica)
+      setQuantidade(item.quantidade)
+      setPrecoUnitario(item.precoUnitario)
     }
-  }, [item]);
+  }, [item])
 
   const handleSave = async () => {
-    if (!codigo || !descricao || !quantidade || !precoUnitario) {
-      alert('Por favor, preencha todos os campos obrigatórios.');
-      return;
+    if (!codigo || !materialName || !quantidade || !precoUnitario) {
+      alert('Por favor, preencha todos os campos obrigatórios.')
+      return
     }
 
-    // Crie um objeto com os dados atuais
-    const updatedData = {
+    const updatedData: ItemData = {
       codigo,
-      descricao,
+      materialName,
       medida,
       ncm,
       codigoFabrica,
       quantidade,
-      precoUnitario,
-    };
+      precoUnitario
+    }
 
-    // Verifique se houve mudanças em relação ao item original
-    const changes: any = {};
+    const changes: Partial<ItemData> = {}
 
-    // Verifique e adicione os campos alterados ao objeto de mudanças
-    Object.keys(updatedData).forEach(key => {
-      if (updatedData[key] !== item[key]) {
-        changes[key] = updatedData[key];
+    Object.keys(updatedData).forEach((key) => {
+      if (updatedData[key] !== item[key as keyof ItemData]) {
+        changes[key as keyof ItemData] = updatedData[key]
       }
-    });
+    })
 
-    // Se não houver alterações, não faz sentido enviar a requisição
     if (Object.keys(changes).length === 0) {
-      alert('Nenhuma alteração detectada.');
-      return;
+      alert('Nenhuma alteração detectada.')
+      return
     }
 
     try {
-      // Atualiza os dados do item, enviando apenas os campos alterados
-      await CardEstoqueService.editarItem(item.cardId, item._id, changes);
-      onSave(); // Notifica o componente pai que a edição foi salva
-      onOpenChange(false); // Fecha o modal
+      // Adicionei log para inspecionar os dados antes de enviar
+      console.log('Dados enviados para editar:', {
+        itemId: item._id,
+        updatedData: changes
+      })
+
+      await editarItem({
+        cardId: item.cardId,
+        itemId: item._id,
+        updatedData: changes
+      })
+
+      onSave() // Notifica o componente pai que a edição foi salva
+      onOpenChange(false) // Fecha o modal após a edição ser salva com sucesso
     } catch (error) {
-      console.error('Erro ao salvar item:', error);
-      alert('Erro ao salvar o item. Tente novamente.');
+      // Alterado para mostrar mensagem de erro mais detalhada
+      console.error('Erro ao salvar item:', error)
+      alert('Erro ao salvar o item. Tente novamente. Erro: ' + error.message) // Inclui a mensagem de erro
     }
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent>
         <h2 className="text-lg font-semibold">Editar Item</h2>
 
-        {/* Campos do Formulário */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700">Código</label>
           <Input
@@ -97,10 +123,10 @@ export function ModalEditarItem({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Descrição</label>
+          <label className="block text-sm font-medium text-gray-700">Material</label>
           <Input
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
+            value={materialName}
+            onChange={(e) => setmaterialName(e.target.value)}
             className="mt-2"
           />
         </div>
@@ -124,7 +150,9 @@ export function ModalEditarItem({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Código de Fábrica</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Código de Fábrica
+          </label>
           <Input
             value={codigoFabrica}
             onChange={(e) => setCodigoFabrica(e.target.value)}
@@ -143,7 +171,9 @@ export function ModalEditarItem({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Preço Unitário</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Preço Unitário
+          </label>
           <Input
             type="number"
             value={precoUnitario}
@@ -153,14 +183,20 @@ export function ModalEditarItem({
         </div>
 
         <div className="mt-4 flex justify-end gap-2">
-          <Button onClick={() => onOpenChange(false)} variant="secondary">
+          <Button
+            onClick={() => onOpenChange(false)}
+            variant="secondary"
+          >
             Cancelar
           </Button>
-          <Button onClick={handleSave} className="bg-blue-600 text-white">
+          <Button
+            onClick={handleSave}
+            className="bg-blue-600 text-white"
+          >
             Salvar
           </Button>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

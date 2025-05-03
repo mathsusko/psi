@@ -11,6 +11,8 @@ const criarCliente = async (clienteData: {
   cnpjCpf: string
   endereco: string
   numeroEndereco: string
+  email: string
+  telefone: string
   complemento: string
   bairro: string
   cep: string

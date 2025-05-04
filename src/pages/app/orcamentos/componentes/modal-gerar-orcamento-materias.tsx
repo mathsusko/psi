@@ -26,8 +26,11 @@ export function DialogAddMateriais() {
     medidas,
     loadingMedidas,
     handleCategoriaChange,
-    handleMaterialChange
-  } = useCategoria() // Usando o hook para gerenciar categoria e materiais
+    handleMaterialChange,
+    fetchMedidas
+  } = useCategoria()
+
+  const [materialDataState, setMaterialData] = useState(materialData)
 
   // Função para renderizar os campos com base na categoria selecionada
   const renderFieldsByCategory = () => {
@@ -41,11 +44,10 @@ export function DialogAddMateriais() {
             >
               Imagem
             </label>
-            {/* Verificar se a imagem foi carregada */}
-            {materialData.imagem ? (
+            {materialDataState.imagem ? (
               <img
-                src={`http://localhost:3333${materialData.imagem}`}
-                alt={materialData.nome || 'Imagem do material'}
+                src={`http://localhost:3333${materialDataState.imagem}`}
+                alt={materialDataState.nome || 'Imagem do material'}
                 className="w-[227px] h-[227px] object-contain border border-sidebar rounded-sm"
               />
             ) : (
@@ -64,7 +66,7 @@ export function DialogAddMateriais() {
             </label>
             <DropdownMenu>
               <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-                {materialData.nome || 'Escolha um material'}
+                {materialDataState.nome || 'Escolha um material'}
                 <ChevronDown size="16" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -76,7 +78,16 @@ export function DialogAddMateriais() {
                     <DropdownMenuItem
                       key={card._id}
                       className="p-2 rounded-md"
-                      onClick={() => handleMaterialChange(card)}
+                      onClick={() => {
+                        setMaterialData({
+                          ...materialDataState,
+                          nome: card.nome,
+                          imagem: card.imagemUrl,
+                          id: card._id // Atualiza o ID para buscar as medidas
+                        })
+                        // Após selecionar o material, carregar as medidas
+                        fetchMedidas(card._id)
+                      }}
                     >
                       <span>{card.nome}</span>
                     </DropdownMenuItem>
@@ -94,6 +105,7 @@ export function DialogAddMateriais() {
           </div>
         </div>
 
+        {/* Dropdown de Medidas */}
         <div className="space-y-2 w-full mb-4">
           <label
             className="text-sm font-medium text-gray-700"
@@ -103,9 +115,7 @@ export function DialogAddMateriais() {
           </label>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-              {materialData.medida || 'Escolha uma medida'}{' '}
-              {/* Atualiza o trigger com a medida selecionada */}
-              <ChevronDown size="16" />
+              {materialDataState.medida || 'Escolha uma medida'} <ChevronDown size="16" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
@@ -123,9 +133,15 @@ export function DialogAddMateriais() {
                   <DropdownMenuItem
                     key={index}
                     className="p-2 rounded-md"
-                    onClick={() => setMaterialData({ ...materialData, medida: medida })}
+                    onClick={() => {
+                      // Atualiza a medida selecionada no estado de materialData
+                      setMaterialData({
+                        ...materialDataState,
+                        medida
+                      })
+                    }}
                   >
-                    {medida} {/* Exibe a medida selecionada */}
+                    {medida}
                   </DropdownMenuItem>
                 ))
               ) : (
@@ -140,6 +156,7 @@ export function DialogAddMateriais() {
           </DropdownMenu>
         </div>
 
+        {/* Campos de Quantidade e Preço */}
         <div className="space-y-2 w-full mb-4">
           <label
             className="text-sm font-medium text-gray-700"
@@ -149,47 +166,53 @@ export function DialogAddMateriais() {
           </label>
           <Input
             id="quantidade"
-            value={materialData.quantidade}
+            value={materialDataState.quantidade}
             onChange={(e) =>
-              setMaterialData({ ...materialData, quantidade: e.target.value })
+              setMaterialData({
+                ...materialDataState,
+                quantidade: e.target.value
+              })
             }
             placeholder="10"
           />
         </div>
 
-        <div className="flex gap-2 w-full mb-4">
-          <div className="space-y-2 w-full">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="ncm"
-            >
-              Preço Unitário
-            </label>
-            <Input
-              id="ncm"
-              value={materialData.precoUn}
-              onChange={(e) =>
-                setMaterialData({ ...materialData, precoUn: e.target.value })
-              }
-              placeholder="R$ 10,00"
-            />
-          </div>
-          <div className="space-y-2  w-full">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="cod-fabrica"
-            >
-              Preço total
-            </label>
-            <Input
-              id="cod-fabrica"
-              value={materialData.precoTotal}
-              onChange={(e) =>
-                setMaterialData({ ...materialData, precoTotal: e.target.value })
-              }
-              placeholder="Trazer dados automaticamente"
-            />
-          </div>
+        <div className="space-y-2 w-full mb-4">
+          <label
+            className="text-sm font-medium text-gray-700"
+            htmlFor="preco"
+          >
+            Preço Unitário
+          </label>
+          <Input
+            id="preco"
+            value={materialDataState.precoUn}
+            onChange={(e) =>
+              setMaterialData({
+                ...materialDataState,
+                precoUn: e.target.value
+              })
+            }
+            placeholder="R$ 10,00"
+          />
+        </div>
+
+        {/* Cálculo automático de Preço Total */}
+        <div className="space-y-2 w-full mb-4">
+          <label
+            className="text-sm font-medium text-gray-700"
+            htmlFor="precoTotal"
+          >
+            Preço Total
+          </label>
+          <Input
+            id="precoTotal"
+            value={materialDataState.precoTotal}
+            disabled
+            placeholder={`R$ ${(
+              Number(materialDataState.precoUn) * Number(materialDataState.quantidade)
+            ).toFixed(2)}`} // Calculando o preço total
+          />
         </div>
       </div>
     )

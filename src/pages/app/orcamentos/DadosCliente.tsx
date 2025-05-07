@@ -9,34 +9,30 @@ import {
 } from '@radix-ui/react-dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 
-export function DadosCliente() {
-  const [clientes, setClientes] = useState([]) // Dados dos clientes
-  const [selectedCliente, setSelectedCliente] = useState('') // Cliente selecionado
+interface Props {
+  onSelectCliente: (clienteId: string) => void
+}
+
+export function DadosCliente({ onSelectCliente }: Props) {
+  const [clientes, setClientes] = useState<any[]>([])
+  const [selectedNome, setSelectedNome] = useState('')
 
   useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        const response = await ClientesService.listar() // Requisição para pegar os dados da API
-        setClientes(response) // Armazenar os clientes
-      } catch (error) {
-        console.error('Erro ao carregar dados dos clientes:', error)
-      }
-    }
+    ClientesService.listar().then(setClientes).catch(console.error)
+  }, [])
 
-    fetchClientes() // Chamada à função
-  }, []) // Carrega quando o componente for montado
-
-  const handleClienteChange = (nomeCliente: string) => {
-    setSelectedCliente(nomeCliente) // Atualiza o cliente selecionado
+  const handleClienteChange = (nomeEmpresa: string) => {
+    setSelectedNome(nomeEmpresa)
+    const cliente = clientes.find((c) => c.nomeEmpresa === nomeEmpresa)
+    if (cliente) onSelectCliente(cliente._id)
   }
 
-  // Função para renderizar os dados do cliente
   const renderClienteInfo = () => {
-    const cliente = clientes.find((cliente) => cliente.nomeEmpresa === selectedCliente)
-    if (!cliente) return null // Se não encontrar o cliente, não renderiza nada
+    const cliente = clientes.find((c) => c.nomeEmpresa === selectedNome)
+    if (!cliente) return null
     return (
-      <div className="flex gap-6 w-full px-4">
-        <div className="flex flex-col gap-2 text-xs">
+      <div className="flex flex-col gap-12 w-full px-4">
+        <div className="flex gap-12 text-xs">
           <div>
             <span className="text-zinc-500">Nome</span>
             <p>{cliente.nomeEmpresa}</p>
@@ -46,6 +42,14 @@ export function DadosCliente() {
             <p>{cliente.cnpjCpf}</p>
           </div>
           <div>
+            <span className="text-zinc-500">Inscrição Estadual</span>
+            <p>{cliente.ie}</p>
+          </div>
+          <div>
+            <span className="text-zinc-500">Categoria</span>
+            <p>{cliente.categoria}</p>
+          </div>
+          <div>
             <span className="text-zinc-500">E-mail</span>
             <p>{cliente.email}</p>
           </div>
@@ -53,13 +57,8 @@ export function DadosCliente() {
             <span className="text-zinc-500">Telefone</span>
             <p>{cliente.telefone}</p>
           </div>
-          <div>
-            <span className="text-zinc-500">Categoria</span>
-            <p>{cliente.categoria}</p>
-          </div>
         </div>
-
-        <div className="flex flex-col gap-2 text-xs">
+        <div className="flex gap-12 text-xs">
           <div>
             <span className="text-zinc-500">Endereço</span>
             <p>{cliente.endereco}</p>
@@ -86,20 +85,14 @@ export function DadosCliente() {
   }
 
   return (
-    <div className="flex flex-col gap-4 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
+    <div className="flex flex-col gap-4 p-4 rounded-xl bg-sidebar text-sidebar-foreground">
       <span>Dados do cliente</span>
       <div className="flex justify-between gap-4">
         <div className="flex flex-col gap-2 w-[400px]">
-          <label
-            htmlFor="Escolha um Cliente"
-            className="px-1 text-xs"
-          >
-            Escolha um cliente
-          </label>
+          <label className="px-1 text-xs">Escolha um cliente</label>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex justify-between w-[300px] items-center p-2 border rounded-md">
-              {selectedCliente ? selectedCliente : 'Escolha um cliente'}{' '}
-              <ChevronDown size="16" />
+            <DropdownMenuTrigger className="flex justify-between items-center p-2 border rounded-md w-full">
+              {selectedNome || 'Escolha um cliente'} <ChevronDown size={16} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
@@ -107,8 +100,8 @@ export function DadosCliente() {
             >
               {clientes.map((cliente) => (
                 <DropdownMenuItem
-                  className="p-2 rounded-md"
                   key={cliente._id}
+                  className="p-2 rounded-md"
                   onClick={() => handleClienteChange(cliente.nomeEmpresa)}
                 >
                   {cliente.nomeEmpresa}
@@ -117,9 +110,7 @@ export function DadosCliente() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-
-        {/* Exibindo as informações do cliente */}
-        {selectedCliente && renderClienteInfo()}
+        {selectedNome && renderClienteInfo()}
       </div>
     </div>
   )

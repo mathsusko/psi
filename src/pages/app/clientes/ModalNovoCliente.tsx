@@ -29,7 +29,8 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
     bairro: '',
     cep: '',
     cidade: '',
-    estado: ''
+    estado: '',
+    ie: ''
   })
 
   const queryClient = useQueryClient()
@@ -57,7 +58,8 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
         bairro: '',
         cep: '',
         cidade: '',
-        estado: ''
+        estado: '',
+        ie: ''
       })
     },
     onError: () => {
@@ -105,6 +107,12 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
               name="cnpjCpf"
               placeholder="CNPJ/CPF"
               value={form.cnpjCpf}
+              onChange={handleChange}
+            />
+            <Input
+              name="ie"
+              placeholder="Inscrição Estadual"
+              value={form.ie}
               onChange={handleChange}
             />
             <Input

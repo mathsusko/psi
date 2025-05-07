@@ -1,145 +1,260 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { DadosPrestador } from './DadosPrestador'
-import { DadosCliente } from './DadosCliente'
-
 import { Input } from '@/components/ui/input'
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
-  TableRow
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell
 } from '@/components/ui/table'
-import { Delete, Edit, MoveLeft, Plus } from 'lucide-react'
-import { Helmet } from 'react-helmet-async'
-import { Link, NavLink } from 'react-router-dom'
+import { MoveLeft, Plus, Delete } from 'lucide-react'
+import { DadosPrestador } from './DadosPrestador'
+import { DadosCliente } from './DadosCliente'
 import { DialogAddMateriais } from './componentes/modal-gerar-orcamento-materias'
 
+import { useMateriaisList } from '@/hooks/useMateriaisList'
+import { createOrcamento, OrcamentoDTO } from '@/api/Orcamento'
+import { createOrcamentoItem } from '@/api/OrcamentoItem'
+import { Separator } from '@/components/ui/separator'
+
 export function GerarOrcamentoMateriais() {
+  const navigate = useNavigate()
+
+  // Estados para IDs dinâmicos
+  const [clienteId, setClienteId] = useState('')
+  const [prestadorId, setPrestadorId] = useState('')
+
+  // BRL formatter state
+  const [custoBRL, setCustoBRL] = useState('R$ 0,00')
+  const [custoNum, setCustoNum] = useState(0)
+
+  // datas de início e saída
+  const [dataInicio, setDataInicio] = useState('')
+  const [dataSaida, setDataSaida] = useState('')
+
+  // lista de itens
+  const { itens, addItem, removeItem } = useMateriaisList()
+
+  const [isSaving, setIsSaving] = useState(false)
+
+  // atualiza custo em BRL e número
+  const handleCustoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onlyDigits = e.target.value.replace(/\D/g, '')
+    if (!onlyDigits) {
+      setCustoBRL('R$ 0,00')
+      setCustoNum(0)
+      return
+    }
+    const cents = parseInt(onlyDigits, 10)
+    const value = cents / 100
+    setCustoNum(value)
+    setCustoBRL(
+      new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      }).format(value)
+    )
+  }
+
+  // cria orçamento e itens, depois redireciona
+  const handleConcluir = async () => {
+    if (!dataInicio || !dataSaida || itens.length === 0 || !clienteId || !prestadorId) {
+      // aqui pode exibir um toast
+      console.warn('Preencha todos os campos obrigatórios.')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const orcDto: OrcamentoDTO = {
+        prestadorId,
+        clienteId,
+        custo: custoNum,
+        dataInicio: new Date(dataInicio).toISOString(),
+        dataSaida: new Date(dataSaida).toISOString()
+      }
+      const orc = await createOrcamento(orcDto)
+
+      await Promise.all(
+        itens.map((item) =>
+          createOrcamentoItem({
+            orcamentoId: orc._id!,
+            materialId: item.id,
+            nome: item.nome,
+            medida: item.medida,
+            quantidade: item.quantidade,
+            precoUn: item.precoUn,
+            imagem: item.imagem
+          })
+        )
+      )
+
+      navigate(`/previsualizacao-orcamento-materiais/${orc._id}`, {
+        state: { orcamento: orc, itens }
+      })
+    } catch (err) {
+      console.error('Erro ao salvar orçamento completo:', err)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   return (
     <>
-      <Helmet title="Gerar Orçamentos Matariais" />
-      <div className="flex flex-col gap-6 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
+      <Helmet title="Gerar Orçamento Materiais" />
+
+      {/* cabeçalho */}
+      <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <Link
           to="/orcamentos-de-materiais"
-          className="flex gap-2 items-center text-xs"
+          className="text-xs flex gap-2"
         >
-          <MoveLeft size="12" />
-          Voltar
+          <MoveLeft size={12} /> Voltar
         </Link>
-        <h1 className="text-sm font-bold tracking-tight">Criar Orçamento Materiais</h1>
+        <h1 className="text-sm font-bold">Criar Orçamento Materiais</h1>
       </div>
 
-      <div className="flex flex-col gap-4 justify-between rounded-xl bg-sidebar text-sidebar-foreground">
-        {/* Dados do Prestador */}
-        <DadosPrestador />
-
-        {/* Dados do Cliente */}
-        <DadosCliente />
+      {/* dados prestador / cliente */}
+      <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
+        <DadosPrestador onSelectPrestador={(id) => setPrestadorId(id)} />
+        <Separator
+          className="mt-[32px]"
+          orientation="horizontal"
+        />
+        <DadosCliente onSelectCliente={(id) => setClienteId(id)} />
       </div>
 
-      <div className="flex flex-col gap-4 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
-        <span>Dados do Orçamento de Produto</span>
-        <div className="flex justify-between gap-4">
-          <div className="flex flex-col gap-2 w-full">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1 text-xs"
-            >
-              Custo
-            </label>
-            <Input
-              id="cst"
-              defaultValue="R$ 10.000,00"
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-full">
-            <label
-              htmlFor="CPF"
-              className="px-1 text-xs"
-            >
-              Data Entra. Início
-            </label>
-            <Input
-              id="cst"
-              defaultValue="00000"
-            />
-          </div>
-          <div className="flex flex-col gap-2 w-full">
-            <label
-              htmlFor="I.E"
-              className="px-1 text-xs"
-            >
-              Data Saída
-            </label>
-            <Input
-              id="cst"
-              defaultValue="00000"
-            />
-          </div>
+      {/* cabeçalho do orçamento (custo + datas) */}
+      <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground flex gap-4">
+        <div className="flex flex-col w-full">
+          <label
+            htmlFor="custo"
+            className="text-xs"
+          >
+            Custo
+          </label>
+          <Input
+            id="custo"
+            value={custoBRL}
+            onChange={handleCustoChange}
+            placeholder="R$ 0,00"
+          />
+        </div>
+        <div className="flex flex-col w-full">
+          <label
+            htmlFor="dataInicio"
+            className="text-xs"
+          >
+            Data Início
+          </label>
+          <Input
+            id="dataInicio"
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col w-full">
+          <label
+            htmlFor="dataSaida"
+            className="text-xs"
+          >
+            Data Saída
+          </label>
+          <Input
+            id="dataSaida"
+            type="date"
+            value={dataSaida}
+            onChange={(e) => setDataSaida(e.target.value)}
+          />
         </div>
       </div>
-      <div className="flex flex-col gap-4 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
-        <span>Dados da Lista de Produtos</span>
-        <Table className="border rounded-md">
+
+      {/* tabela de itens */}
+      <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
+        <span>Lista de Produtos</span>
+        <Table className="mt-2">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-muted-foreground">Imagem</TableHead>
-              <TableHead className="text-muted-foreground">Material</TableHead>
-              <TableHead className="text-muted-foreground">Medida</TableHead>
-              <TableHead className="text-muted-foreground">Qtd/Un/Metros</TableHead>
-              <TableHead className="text-muted-foreground">Preço</TableHead>
-              <TableHead className="text-muted-foreground">Valor Total</TableHead>
-              <TableHead className="text-muted-foreground flex items-center justify-center">
-                Ações
-              </TableHead>
+              <TableHead>Imagem</TableHead>
+              <TableHead>Material</TableHead>
+              <TableHead>Medida</TableHead>
+              <TableHead>Qtd</TableHead>
+              <TableHead>Preço Unit.</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead className="text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
-
           <TableBody>
-            <TableRow>
-              <TableCell className="">
-                <img
-                  src=""
-                  alt=""
-                  className="w-[64px] h-[64px] object-contain border border-sidebar rounded-sm"
-                />
-              </TableCell>
-              <TableCell className="">Cotovelo</TableCell>
-              <TableCell className="">6"</TableCell>
-              <TableCell className="">10</TableCell>
-              <TableCell className="">10</TableCell>
-              <TableCell className="">10</TableCell>
-              <TableCell className="flex items-center justify-center gap-4">
-                <Button variant="outline">
-                  <Delete />
-                </Button>
-                <Button variant="outline">
-                  <Edit />
-                </Button>
-              </TableCell>
-            </TableRow>
+            {itens.map((item, idx) => {
+              const total = item.quantidade * item.precoUn
+              return (
+                <TableRow key={idx}>
+                  <TableCell>
+                    <img
+                      src={`http://localhost:3333${item.imagem}`}
+                      alt={item.nome}
+                      className="w-16 h-16 object-contain border rounded-sm"
+                    />
+                  </TableCell>
+                  <TableCell>{item.nome}</TableCell>
+                  <TableCell>{item.medida}</TableCell>
+                  <TableCell>{item.quantidade}</TableCell>
+                  <TableCell>R$ {item.precoUn.toFixed(2).replace('.', ',')}</TableCell>
+                  <TableCell>
+                    R$ {(item.quantidade * item.precoUn).toFixed(2).replace('.', ',')}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeItem(idx)}
+                    >
+                      <Delete size={16} />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
 
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">
-              Adicionar <Plus />
+            <Button
+              variant="outline"
+              className="mt-4"
+            >
+              Adicionar <Plus size={16} />
             </Button>
           </DialogTrigger>
-
-          <DialogAddMateriais />
+          <DialogAddMateriais onAdd={addItem} />
         </Dialog>
       </div>
 
-      <div className="w-full flex justify-end">
-        <NavLink to="/previsualizacao-orcamento-materiais">
-          <Button className="px-12">Concluir</Button>
-        </NavLink>
+      {/* concluir */}
+      <div className="flex justify-end p-4">
+        <Button
+          onClick={handleConcluir}
+          disabled={
+            isSaving ||
+            itens.length === 0 ||
+            !dataInicio ||
+            !dataSaida ||
+            !clienteId ||
+            !prestadorId
+          }
+        >
+          {isSaving ? 'Salvando...' : 'Concluir'}
+        </Button>
       </div>
     </>
   )
 }
+  

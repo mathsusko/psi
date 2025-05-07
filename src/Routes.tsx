@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
       { path: '/gerar-orcamento-materiais', element: <GerarOrcamentoMateriais /> },
       { path: '/gerar-orcamento-servicos', element: <GerarOrcamentoServicos /> },
       {
-        path: '/previsualizacao-orcamento-materiais',
+        path: '/previsualizacao-orcamento-materiais/:id',
         element: <PrevisualizacaoOrcamentoDeMateriais />
       },
       {

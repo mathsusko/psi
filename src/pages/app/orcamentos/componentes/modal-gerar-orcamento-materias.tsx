@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
   DialogHeader,
   DialogContent,
@@ -14,11 +14,16 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown } from 'lucide-react'
 import { Separator } from '@radix-ui/react-separator'
-import { useCategoria } from '@/hooks/useCategoria' // Importando o hook
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
+import { MaterialItem } from '@/hooks/useMateriaisList'
+import { useCategoria } from '@/hooks/useCategoria'
 
-export function DialogAddMateriais() {
+interface DialogAddMateriaisProps {
+  onAdd: (item: MaterialItem) => void
+}
+
+export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
   const {
     selectedCategoria,
     materialData,
@@ -26,48 +31,66 @@ export function DialogAddMateriais() {
     medidas,
     loadingMedidas,
     handleCategoriaChange,
-    handleMaterialChange,
     fetchMedidas
   } = useCategoria()
 
-  const [materialDataState, setMaterialData] = useState(materialData)
+  const [state, setState] = useState({
+    id: materialData.id || '',
+    nome: materialData.nome || '',
+    imagem: materialData.imagem || '',
+    medida: materialData.medida || '',
+    quantidade: materialData.quantidade || '',
+    precoUn: materialData.precoUn || ''
+  })
 
-  // Função para renderizar os campos com base na categoria selecionada
-  const renderFieldsByCategory = () => {
+  // formata BR: só dígitos e vírgula
+  const handlePrecoUnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value.replace(/[^\d,]/g, '')
+    const p = v.split(',')
+    if (p.length > 2) v = p[0] + ',' + p.slice(1).join('')
+    if (p[1]?.length > 2) p[1] = p[1].slice(0, 2)
+    setState((prev) => ({ ...prev, precoUn: v }))
+  }
+
+  const parseBr = (s: string) => Number(s.replace(/\./g, '').replace(/,/g, '.')) || 0
+
+  function renderFields() {
+    const qtd = Number(state.quantidade) || 0
+    const unit = parseBr(state.precoUn)
+    const tot = qtd * unit
+
     return (
       <div>
-        <div className="flex justify-between gap-2 w-full mb-4">
-          <div className="space-y-2">
+        {/* IMAGEM + MATERIAL */}
+        <div className="flex justify-between gap-2 mb-4">
+          <div className="space-y-2 w-[227px]">
             <label
-              className="text-sm font-medium text-gray-700"
               htmlFor="imagem"
+              className="text-sm font-medium text-gray-700"
             >
               Imagem
             </label>
-            {materialDataState.imagem ? (
+            {state.imagem ? (
               <img
-                src={`http://localhost:3333${materialDataState.imagem}`}
-                alt={materialDataState.nome || 'Imagem do material'}
-                className="w-[227px] h-[227px] object-contain border border-sidebar rounded-sm"
+                src={`http://localhost:3333${state.imagem}`}
+                alt={state.nome || 'Imagem do material'}
+                className="w-[227px] h-[227px] object-contain border rounded-sm"
               />
             ) : (
-              <Skeleton
-                className="w-[227px] h-[227px] bg-gray-300 rounded-sm"
-                alt="Carregando imagem..."
-              />
+              <Skeleton className="w-[227px] h-[227px] bg-gray-300 rounded-sm" />
             )}
           </div>
           <div className="space-y-2 w-[227px]">
             <label
-              className="text-sm font-medium text-gray-700"
               htmlFor="material"
+              className="text-sm font-medium text-gray-700"
             >
               Material
             </label>
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-                {materialDataState.nome || 'Escolha um material'}
-                <ChevronDown size="16" />
+              <DropdownMenuTrigger className="flex justify-between w-full p-2 border rounded-md">
+                {state.nome || 'Escolha um material'}
+                <ChevronDown size={16} />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
@@ -77,142 +100,135 @@ export function DialogAddMateriais() {
                   filteredCards.map((card) => (
                     <DropdownMenuItem
                       key={card._id}
-                      className="p-2 rounded-md"
                       onClick={() => {
-                        setMaterialData({
-                          ...materialDataState,
+                        setState((prev) => ({
+                          ...prev,
+                          id: card._id,
                           nome: card.nome,
-                          imagem: card.imagemUrl,
-                          id: card._id // Atualiza o ID para buscar as medidas
-                        })
-                        // Após selecionar o material, carregar as medidas
+                          imagem: card.imagemUrl
+                        }))
                         fetchMedidas(card._id)
                       }}
                     >
-                      <span>{card.nome}</span>
+                      {card.nome}
                     </DropdownMenuItem>
                   ))
                 ) : (
-                  <DropdownMenuItem
-                    disabled
-                    className="p-2 rounded-md"
-                  >
-                    Nenhum material disponível
-                  </DropdownMenuItem>
+                  <DropdownMenuItem disabled>Nenhum material disponível</DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
 
-        {/* Dropdown de Medidas */}
-        <div className="space-y-2 w-full mb-4">
+        {/* MEDIDA */}
+        <div className="space-y-2 mb-4">
           <label
-            className="text-sm font-medium text-gray-700"
             htmlFor="medida"
+            className="text-sm font-medium text-gray-700"
           >
             Medida
           </label>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex justify-between w-full items-center p-2 border rounded-md">
-              {materialDataState.medida || 'Escolha uma medida'} <ChevronDown size="16" />
+            <DropdownMenuTrigger className="flex justify-between w-full p-2 border rounded-md">
+              {state.medida || 'Escolha uma medida'} <ChevronDown size={16} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
               className="p-2 border rounded-md bg-sidebar"
             >
               {loadingMedidas ? (
-                <DropdownMenuItem
-                  disabled
-                  className="p-2 rounded-md"
-                >
-                  Carregando medidas...
-                </DropdownMenuItem>
+                <DropdownMenuItem disabled>Carregando medidas...</DropdownMenuItem>
               ) : medidas.length > 0 ? (
-                medidas.map((medida, index) => (
+                medidas.map((m, i) => (
                   <DropdownMenuItem
-                    key={index}
-                    className="p-2 rounded-md"
-                    onClick={() => {
-                      // Atualiza a medida selecionada no estado de materialData
-                      setMaterialData({
-                        ...materialDataState,
-                        medida
-                      })
-                    }}
+                    key={i}
+                    onClick={() => setState((prev) => ({ ...prev, medida: m }))}
                   >
-                    {medida}
+                    {m}
                   </DropdownMenuItem>
                 ))
               ) : (
-                <DropdownMenuItem
-                  disabled
-                  className="p-2 rounded-md"
-                >
-                  Nenhuma medida disponível
-                </DropdownMenuItem>
+                <DropdownMenuItem disabled>Nenhuma medida disponível</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Campos de Quantidade e Preço */}
-        <div className="space-y-2 w-full mb-4">
+        {/* QUANTIDADE */}
+        <div className="space-y-2 mb-4">
           <label
-            className="text-sm font-medium text-gray-700"
             htmlFor="quantidade"
+            className="text-sm font-medium text-gray-700"
           >
             Quantidade
           </label>
           <Input
             id="quantidade"
-            value={materialDataState.quantidade}
+            value={state.quantidade}
             onChange={(e) =>
-              setMaterialData({
-                ...materialDataState,
-                quantidade: e.target.value
-              })
+              setState((prev) => ({ ...prev, quantidade: e.target.value }))
             }
             placeholder="10"
           />
         </div>
 
-        <div className="space-y-2 w-full mb-4">
+        {/* PREÇO UNITÁRIO */}
+        <div className="space-y-2 mb-4">
           <label
+            htmlFor="precoUn"
             className="text-sm font-medium text-gray-700"
-            htmlFor="preco"
           >
             Preço Unitário
           </label>
           <Input
-            id="preco"
-            value={materialDataState.precoUn}
-            onChange={(e) =>
-              setMaterialData({
-                ...materialDataState,
-                precoUn: e.target.value
-              })
-            }
-            placeholder="R$ 10,00"
+            id="precoUn"
+            value={state.precoUn}
+            onChange={handlePrecoUnChange}
+            placeholder="10,00"
           />
         </div>
 
-        {/* Cálculo automático de Preço Total */}
-        <div className="space-y-2 w-full mb-4">
+        {/* PREÇO TOTAL */}
+        <div className="space-y-2 mb-4">
           <label
-            className="text-sm font-medium text-gray-700"
             htmlFor="precoTotal"
+            className="text-sm font-medium text-gray-700"
           >
             Preço Total
           </label>
           <Input
             id="precoTotal"
-            value={materialDataState.precoTotal}
             disabled
-            placeholder={`R$ ${(
-              Number(materialDataState.precoUn) * Number(materialDataState.quantidade)
-            ).toFixed(2)}`} // Calculando o preço total
+            value={`R$ ${tot.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
           />
+        </div>
+
+        {/* Botão Adicionar */}
+        <div className="flex justify-end pt-4">
+          <Button
+            type="button"
+            onClick={() => {
+              onAdd({
+                id: state.id,
+                nome: state.nome,
+                imagem: state.imagem,
+                medida: state.medida,
+                quantidade: Number(state.quantidade),
+                precoUn: parseBr(state.precoUn)
+              })
+              setState({
+                id: '',
+                nome: '',
+                imagem: '',
+                medida: '',
+                quantidade: '',
+                precoUn: ''
+              })
+            }}
+          >
+            Adicionar
+          </Button>
         </div>
       </div>
     )
@@ -222,38 +238,26 @@ export function DialogAddMateriais() {
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Adicionar Item</DialogTitle>
-        <DialogDescription>
-          Adicione um item à sua lista orçamentária, escolha entre os três tipos de
-          produto de seu estoque.
-        </DialogDescription>
+        <DialogDescription>Preencha os campos e clique em “Adicionar”</DialogDescription>
       </DialogHeader>
-
       <form className="grid gap-4 py-4">
+        {/* Categoria */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex justify-between w-[200px] items-center p-2 border rounded-md">
-            {selectedCategoria ? selectedCategoria : 'Escolha uma categoria'}
-            <ChevronDown size="16" />
+          <DropdownMenuTrigger className="flex justify-between w-[200px] p-2 border rounded-md">
+            {selectedCategoria || 'Escolha uma categoria'}
+            <ChevronDown size={16} />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
             className="p-2 border rounded-md bg-sidebar"
           >
-            <DropdownMenuItem
-              className="p-2 rounded-md"
-              onClick={() => handleCategoriaChange('Un')}
-            >
+            <DropdownMenuItem onClick={() => handleCategoriaChange('Un')}>
               Material por Un.
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="p-2 rounded-md"
-              onClick={() => handleCategoriaChange('Kg')}
-            >
+            <DropdownMenuItem onClick={() => handleCategoriaChange('Kg')}>
               Material por Kg
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="p-2 rounded-md"
-              onClick={() => handleCategoriaChange('Metros')}
-            >
+            <DropdownMenuItem onClick={() => handleCategoriaChange('Metros')}>
               Material por Metros
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -261,11 +265,7 @@ export function DialogAddMateriais() {
 
         <Separator className="bg-sidebar border-b" />
 
-        <div className="flex flex-col gap-2">{renderFieldsByCategory()}</div>
-
-        <div className="flex justify-end pt-4">
-          <Button type="submit">Adicionar</Button>
-        </div>
+        <div className="flex flex-col gap-2">{renderFields()}</div>
       </form>
     </DialogContent>
   )

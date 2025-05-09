@@ -1,15 +1,11 @@
 // tailwind.config.js
 export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {}
   },
-  plugins: [],
-  // 👇 Adicione isso para compatibilidade com html2canvas
-  experimental: {
-    optimizeUniversalDefaults: true // (opcional)
-  },
-  // 👇 Isso remove o uso de `oklch()` nas cores
   corePlugins: {
-    preflight: false // se estiver usando shadcn-ui, já pode estar assim
-  }
+    colorFunction: false // desativa cores oklch
+  },
+  plugins: []
 }

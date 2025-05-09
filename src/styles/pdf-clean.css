@@ -1,0 +1,8 @@
+.pdf-clean {
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 20px !important; /* padding interno */
+  background: white !important;
+  width: 100% !important;
+}

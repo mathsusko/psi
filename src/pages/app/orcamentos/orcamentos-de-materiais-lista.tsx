@@ -66,7 +66,6 @@ export function OrcamentoDeMateriaisLista() {
             </TableRow>
           </TableBody>
         </Table>
-        <Pagination />
       </div>
     </>
   )

@@ -1,0 +1,136 @@
+.orcamento-container {
+  width: 210mm;
+  min-height: 297mm;
+  background-color: white;
+  color: black;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+}
+
+.header {
+  background-color: #1f2937;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.orcamento-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 64px;
+  height: auto;
+}
+
+.empresa-info h3 {
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orcamento-section {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  gap: 40px;
+}
+
+.orcamento-detalhes,
+.orcamento-cliente {
+  flex: 1;
+}
+
+.orcamento-detalhes h3,
+.orcamento-cliente h3 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.orcamento-tabelas {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 11px;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background-color: #f3f4f6;
+}
+
+.tabela-materiais .item-imagem {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.tabela-totalizadores th[colspan='11'],
+.tabela-recebimento th[colspan='3'],
+.tabela-assinaturas th[colspan='5'] {
+  text-align: left;
+  background-color: #e5e7eb;
+  font-weight: bold;
+  padding-top: 12px;
+}
+
+.orcamento-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 16px;
+}
+
+.btn-outline,
+.btn-primary {
+  padding: 10px 16px;
+  font-size: 14px;
+  border: 1px solid #1f2937;
+  background-color: transparent;
+  color: #1f2937;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background-color: #1f2937;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #374151;
+}
+
+.btn-outline:hover {
+  background-color: #f9fafb;
+}
+
+.loading {
+  padding: 20px;
+  font-size: 16px;
+}

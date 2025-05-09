@@ -37,95 +37,13 @@ const styles = StyleSheet.create({
   infoClient: { marginTop: 8 },
   textClient: { fontSize: 8 },
   clientInfoTwo: { marginTop: 20 },
-  table: {
-    borderWidth: 0.7,
-    borderColor: '#000',
-    borderStyle: 'solid'
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderBottomWidth: 0.7,
-    borderColor: '#000',
-    fontWeight: 'bold'
-  },
-  tableRow: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center'
-  },
-  tableCellOne: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8,
-    borderRightWidth: 0.5,
-    borderColor: '#000'
-  },
-  tableCellTwo: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8,
-    borderRightWidth: 0.5,
-    borderColor: '#000'
-  },
-  tableCellThree: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8,
-    borderRightWidth: 0.5,
-    borderColor: '#000'
-  },
-  tableCellFour: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8,
-    borderRightWidth: 0.5,
-    borderColor: '#000'
-  },
-  tableCellFive: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8,
-    borderRightWidth: 0.5,
-    borderColor: '#000'
-  },
-  tableCellSix: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8
-  },
-  tableImage: {
-    width: 40,
-    height: 60,
-    objectFit: 'cover'
-  },
-  totalsTable: {
-    width: 'auto',
-    borderWidth: 0.7,
-    borderColor: '#000',
-    borderStyle: 'solid',
-    marginTop: 64,
-    marginBottom: 12
-  },
-  totalsRow: { flexDirection: 'row' },
-  totalsCell: {
-    padding: 4,
-    fontSize: 9,
-    textAlign: 'center'
-  },
-  cell1: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
-  cell2: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
-  cell3: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
-  cell4: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
-  cell5: { width: '20%' },
+
+  block: { flex: 1 },
+  label: { fontWeight: 'bold', fontSize: 9 },
+  text: { fontSize: 8, marginBottom: 2 },
+  section: { marginTop: 16 },
   assTable: {
+    marginTop: 64,
     flexDirection: 'row',
     borderWidth: 0.7,
     borderColor: '#000',
@@ -146,16 +64,18 @@ const styles = StyleSheet.create({
     fontSize: 8
   },
   assFour: { width: '33%', padding: 12, fontSize: 8 },
-  assText: { fontSize: 12 }
+  assText: { fontSize: 12 },
+  descricaoBox: {
+    marginTop: 24,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4
+  },
+  descricaoText: { fontSize: 9, lineHeight: 1.5 }
 })
 
-export const OrcamentoPDF = ({ orcamento }) => {
-  const totalItens = orcamento.itens?.reduce(
-    (acc, item) => acc + item.quantidade * item.precoUn,
-    0
-  )
-  console.log(orcamento.clienteId)
-
+export const OrcamentoServicoPDF = ({ orcamento }) => {
   return (
     <Document>
       <Page
@@ -223,12 +143,8 @@ export const OrcamentoPDF = ({ orcamento }) => {
                 <Text style={styles.textClient}>
                   Cliente: {orcamento.clienteId?.nomeEmpresa}
                 </Text>
-                <Text style={styles.textClient}>
-                  CNPJ: {orcamento.clienteId?.cnpjCpf || '---'}
-                </Text>
-                <Text style={styles.textClient}>
-                  I.E: {orcamento.clienteId?.ie || '---'}
-                </Text>
+                <Text style={styles.textClient}>CNPJ: {orcamento.clienteId?.cnpj}</Text>
+                <Text style={styles.textClient}>I.E: {orcamento.clienteId?.ie}</Text>
               </View>
             </View>
             <View style={styles.clientInfoTwo}>
@@ -247,63 +163,10 @@ export const OrcamentoPDF = ({ orcamento }) => {
           </View>
         </View>
 
-        {/* Tabela */}
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableCellOne}>Imagem</Text>
-            <Text style={styles.tableCellTwo}>Material</Text>
-            <Text style={styles.tableCellThree}>Medida</Text>
-            <Text style={styles.tableCellFour}>Qtd</Text>
-            <Text style={styles.tableCellFive}>Preço Un</Text>
-            <Text style={styles.tableCellSix}>Total</Text>
-          </View>
-
-          {orcamento.itens?.map((item, i) => (
-            <View
-              key={i}
-              style={styles.tableRow}
-            >
-              <Image
-                src={item.imagemBase64 || fallbackBase64}
-                style={[styles.tableImage, styles.tableCellOne]}
-              />
-              <Text style={styles.tableCellTwo}>{item.nome}</Text>
-              <Text style={styles.tableCellThree}>{item.medida}</Text>
-              <Text style={styles.tableCellFour}>{item.quantidade}</Text>
-              <Text style={styles.tableCellFive}>
-                R$ {item.precoUn.toFixed(2).replace('.', ',')}
-              </Text>
-              <Text style={styles.tableCellSix}>
-                R$ {(item.quantidade * item.precoUn).toFixed(2).replace('.', ',')}
-              </Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Totais */}
-        <View style={styles.totalsTable}>
-          <View style={styles.totalsRow}>
-            <Text style={[styles.totalsCell, styles.cell1]}>Itens</Text>
-            <Text style={[styles.totalsCell, styles.cell2]}>Quantidade</Text>
-            <Text style={[styles.totalsCell, styles.cell3]}>Total Itens R$</Text>
-            <Text style={[styles.totalsCell, styles.cell4]}>Frete R$</Text>
-            <Text style={[styles.totalsCell, styles.cell5]}>Total Líquido R$</Text>
-          </View>
-          <View style={styles.totalsRow}>
-            <Text style={[styles.totalsCell, styles.cell1]}>
-              {orcamento.itens?.length ?? 0}
-            </Text>
-            <Text style={[styles.totalsCell, styles.cell2]}>
-              {orcamento.itens?.reduce((acc, item) => acc + item.quantidade, 0)}
-            </Text>
-            <Text style={[styles.totalsCell, styles.cell3]}>
-              R$ {totalItens?.toFixed(2).replace('.', ',')}
-            </Text>
-            <Text style={[styles.totalsCell, styles.cell4]}>R$ 0,00</Text>
-            <Text style={[styles.totalsCell, styles.cell5]}>
-              R$ {totalItens?.toFixed(2).replace('.', ',')}
-            </Text>
-          </View>
+        {/* Descrição do serviço */}
+        <View style={styles.descricaoBox}>
+          <Text style={styles.label}>Descrição do serviço</Text>
+          <Text style={styles.descricaoText}>{orcamento.descricaoServico || '---'}</Text>
         </View>
 
         {/* Assinaturas */}

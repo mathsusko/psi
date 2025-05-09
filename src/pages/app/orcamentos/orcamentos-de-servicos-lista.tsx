@@ -1,5 +1,10 @@
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
+import { Download, Plus } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
+import { PDFDownloadLink } from '@react-pdf/renderer'
 
+import { getAllOrcamentos } from '@/api/Orcamento'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -9,12 +14,26 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Pagination } from '@/components/pagination'
-import { Download, Eye, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { NavLink } from '@/components/nav-link'
+import { OrcamentoServicoPDF } from '@/components/pdf/OrcamentoServicoPDF'
 
 export function OrcamentoDeServicosLista() {
+  const [orcamentos, setOrcamentos] = useState<any[]>([])
+
+  useEffect(() => {
+    async function fetchOrcamentos() {
+      try {
+        const data = await getAllOrcamentos()
+        const servicos = data.filter((o) => !!o.descricaoServico)
+        setOrcamentos(servicos)
+      } catch (err) {
+        console.error('Erro ao buscar orçamentos de serviço:', err)
+      }
+    }
+
+    fetchOrcamentos()
+  }, [])
+
   return (
     <>
       <Helmet title="Orçamentos" />
@@ -23,7 +42,11 @@ export function OrcamentoDeServicosLista() {
         <h1 className="text-sm font-bold tracking-tight">Orçamentos de serviços</h1>
         <NavLink to="/gerar-orcamento-servicos">
           <Button variant="outline">
-            Gerar novo orçamento <Plus />
+            Gerar novo orçamento{' '}
+            <Plus
+              className="ml-2"
+              size={16}
+            />
           </Button>
         </NavLink>
       </div>
@@ -36,37 +59,47 @@ export function OrcamentoDeServicosLista() {
             placeholder="Nome do cliente"
           />
         </form>
+
         <Table className="border rounded-md">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-muted-foreground">Cód.</TableHead>
-              <TableHead className="text-muted-foreground">Tipo do orçamento</TableHead>
-              <TableHead className="text-muted-foreground">Tomador</TableHead>
-              <TableHead className="text-muted-foreground">Preço Total</TableHead>
-              <TableHead className="text-muted-foreground">Descrição</TableHead>
-
-              <TableHead className="text-muted-foreground flex items-center justify-center">
-                Ações
-              </TableHead>
+              <TableHead className="text-muted-foreground">ID</TableHead>
+              <TableHead className="text-muted-foreground">Cliente</TableHead>
+              <TableHead className="text-muted-foreground">Custo</TableHead>
+              <TableHead className="text-muted-foreground text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            <TableRow>
-              <TableCell className="">01</TableCell>
-              <TableCell className="">para Serviço</TableCell>
-              <TableCell className="">Condor</TableCell>
-              <TableCell className="">R$ 10.000,00</TableCell>
-              <TableCell className="">Mão de obra</TableCell>
-
-              <TableCell className="flex items-center justify-center gap-4">
-                <Eye size="22" />
-                <Download />
-              </TableCell>
-            </TableRow>
+            {orcamentos.map((orcamento) => (
+              <TableRow key={orcamento._id}>
+                <TableCell>{orcamento._id.slice(-4)}</TableCell>
+                <TableCell>{orcamento.clienteId?.nomeEmpresa || '---'}</TableCell>
+                <TableCell>
+                  R$ {(orcamento.custo ?? 0).toFixed(2).replace('.', ',')}
+                </TableCell>
+                <TableCell className="flex items-center justify-center gap-4">
+                  <PDFDownloadLink
+                    document={<OrcamentoServicoPDF orcamento={orcamento} />}
+                    fileName={`orcamento-servico-${orcamento._id}.pdf`}
+                  >
+                    {({ loading }) =>
+                      loading ? (
+                        <span className="text-xs">Gerando...</span>
+                      ) : (
+                        <Download
+                          size={20}
+                          className="cursor-pointer hover:text-primary"
+                          title="Baixar PDF"
+                        />
+                      )
+                    }
+                  </PDFDownloadLink>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
-        <Pagination />
       </div>
     </>
   )

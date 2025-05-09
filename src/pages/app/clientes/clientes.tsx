@@ -45,7 +45,7 @@ export default function Clientes() {
 
   // Função para navegar para o perfil do cliente
   const verPerfil = (id: string) => {
-    navigate(`/clientes/${id}`) // Corrigido para navegar corretamente
+    navigate(`/clientes/${id}/orcamento`) // Corrigido para navegar corretamente
   }
 
   if (isLoading) return <div>Loading...</div>

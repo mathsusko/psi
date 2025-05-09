@@ -33,11 +33,16 @@ const deletarCliente = async (id: string) => {
   return axios.delete(`${API_URL}/${id}`).then((res) => res.data)
 }
 
+const buscarClientePorId = async (id: string) => {
+  return axios.get(`${API_URL}/${id}`).then((res) => res.data)
+}
+
 const ClientesService = {
   listar: listarClientes,
   criar: criarCliente,
   editar: editarCliente,
-  deletar: deletarCliente
+  deletar: deletarCliente,
+  buscarPorId: buscarClientePorId // ⬅️ nova função
 }
 
 export default ClientesService

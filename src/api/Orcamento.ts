@@ -60,3 +60,5 @@ export async function listOrcamentos(filtros?: {
   const res = await api.get<OrcamentoResponse[]>('/orcamentos', { params: filtros })
   return res.data
 }
+
+export const getAllOrcamentos = listOrcamentos

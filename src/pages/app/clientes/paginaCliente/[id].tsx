@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { MoveLeft } from 'lucide-react'
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom'
@@ -10,7 +9,6 @@ import DadosCliente from './dadosDaEmpresa'
 
 const API_URL = 'http://localhost:3333/api/clientes'
 
-// Função para buscar os dados do cliente por ID
 const fetchCliente = async (id: string) => {
   const response = await axios.get(`${API_URL}/${id}`)
   return response.data
@@ -18,18 +16,16 @@ const fetchCliente = async (id: string) => {
 
 export default function Cliente() {
   const navigate = useNavigate()
-  const { id } = useParams() // Obtendo o id do cliente da URL
+  const { id } = useParams()
 
-  // Usando o React Query com a nova sintaxe v5
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['cliente', id], // Passando o queryKey como array, onde o primeiro item é uma string e o segundo é o id
-    queryFn: () => fetchCliente(id!), // Passando a função para buscar os dados do cliente
-    enabled: !!id // Só faz a requisição quando o id estiver disponível
+    queryKey: ['cliente', id],
+    queryFn: () => fetchCliente(id!),
+    enabled: !!id
   })
 
-  // Função para redirecionar a navegação dentro da página sem recarregar
   const handleNavigation = (section: string) => {
-    navigate(`/clientes/${id}/${section}`) // Navega para as seções de "orcamento", "notas-fiscais", ou "dados-da-empresa"
+    navigate(`/clientes/${id}/${section}`)
   }
 
   if (isLoading) return <div>Carregando...</div>
@@ -46,7 +42,6 @@ export default function Cliente() {
           Voltar
         </Link>
 
-        {/* Renderiza o nome da empresa dinamicamente */}
         <h1 className="text-2xl">{data?.nomeEmpresa}</h1>
 
         <div className="flex gap-2">
@@ -58,7 +53,6 @@ export default function Cliente() {
         </div>
       </div>
 
-      {/* Corpo dinâmico */}
       <div className="flex flex-col gap-4 rounded-md p-4 bg-sidebar">
         <Routes>
           <Route

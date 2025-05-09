@@ -43,7 +43,6 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
     precoUn: materialData.precoUn || ''
   })
 
-  // formata BR: só dígitos e vírgula
   const handlePrecoUnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value.replace(/[^\d,]/g, '')
     const p = v.split(',')
@@ -105,7 +104,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
                           ...prev,
                           id: card._id,
                           nome: card.nome,
-                          imagem: card.imagemUrl
+                          imagem: card.imagemUrl || '' // corrigido para garantir string
                         }))
                         fetchMedidas(card._id)
                       }}
@@ -212,7 +211,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
               onAdd({
                 id: state.id,
                 nome: state.nome,
-                imagem: state.imagem,
+                imagem: state.imagem || '', // força tipo string
                 medida: state.medida,
                 quantidade: Number(state.quantidade),
                 precoUn: parseBr(state.precoUn)

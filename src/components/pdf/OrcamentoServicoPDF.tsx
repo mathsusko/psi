@@ -13,10 +13,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.7,
     borderBottomColor: '#f0f0f0'
   },
-  prestador: {
-    flexDirection: 'row',
-    gap: 24
-  },
+  prestador: { flexDirection: 'row', gap: 24 },
   prestadorRow: { flexDirection: 'row', gap: 12 },
   prestadorTitle: { fontSize: 15 },
   prestadorInfoOne: { marginTop: 8 },
@@ -37,11 +34,6 @@ const styles = StyleSheet.create({
   infoClient: { marginTop: 8 },
   textClient: { fontSize: 8 },
   clientInfoTwo: { marginTop: 20 },
-
-  block: { flex: 1 },
-  label: { fontWeight: 'bold', fontSize: 9 },
-  text: { fontSize: 8, marginBottom: 2 },
-  section: { marginTop: 16 },
   assTable: {
     marginTop: 64,
     flexDirection: 'row',
@@ -72,10 +64,43 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 4
   },
-  descricaoText: { fontSize: 9, lineHeight: 1.5 }
+  descricaoText: { fontSize: 9, lineHeight: 1.5 },
+  label: { fontWeight: 'bold', fontSize: 9 }
 })
 
-export const OrcamentoServicoPDF = ({ orcamento }) => {
+interface Cliente {
+  nomeEmpresa: string
+  cnpj: string
+  ie: string
+  email: string
+  telefone: string
+  endereco: string
+  numeroEndereco: string
+  cidade: string
+  estado: string
+}
+
+interface Prestador {
+  nomeEmpresa: string
+  cnpj: string
+  ie: string
+  email: string
+  telefone: string
+  endereco: string
+  numeroEndereco: string
+  cidade: string
+  estado: string
+}
+
+interface OrcamentoServico {
+  clienteId: Cliente
+  prestadorId: Prestador
+  dataInicio: string
+  dataSaida: string
+  descricaoServico: string
+}
+
+export const OrcamentoServicoPDF = ({ orcamento }: { orcamento: OrcamentoServico }) => {
   return (
     <Document>
       <Page
@@ -90,7 +115,7 @@ export const OrcamentoServicoPDF = ({ orcamento }) => {
           />
           <View style={styles.prestador}>
             <View style={styles.prestadorRow}>
-              <View style={styles}>
+              <View>
                 <Text style={styles.prestadorTitle}>
                   {orcamento.prestadorId?.nomeEmpresa}
                 </Text>
@@ -163,7 +188,7 @@ export const OrcamentoServicoPDF = ({ orcamento }) => {
           </View>
         </View>
 
-        {/* Descrição do serviço */}
+        {/* Descrição */}
         <View style={styles.descricaoBox}>
           <Text style={styles.label}>Descrição do serviço</Text>
           <Text style={styles.descricaoText}>{orcamento.descricaoServico || '---'}</Text>

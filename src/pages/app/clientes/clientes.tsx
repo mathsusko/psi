@@ -8,14 +8,13 @@ import {
   TableBody,
   TableCell
 } from '@/components/ui/table'
-import { ModalNovoCliente } from './ModalNovoCliente' // Importe o novo modal
+import { ModalNovoCliente } from './ModalNovoCliente'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom' // Importação correta para navegar
+import { useNavigate } from 'react-router-dom'
 
 const API_URL = 'http://localhost:3333/api/clientes'
 
-// Função para buscar os clientes
 const fetchClientes = async () => {
   const response = await axios.get(API_URL)
   return response.data
@@ -23,9 +22,8 @@ const fetchClientes = async () => {
 
 export default function Clientes() {
   const [openModal, setOpenModal] = useState(false)
-  const navigate = useNavigate() // Hook para navegação
+  const navigate = useNavigate()
 
-  // Usando o React Query para buscar a lista de clientes
   const {
     data: clientes,
     isLoading,
@@ -39,13 +37,8 @@ export default function Clientes() {
     setOpenModal(true)
   }
 
-  const handleCloseModal = () => {
-    setOpenModal(false)
-  }
-
-  // Função para navegar para o perfil do cliente
   const verPerfil = (id: string) => {
-    navigate(`/clientes/${id}/orcamento`) // Corrigido para navegar corretamente
+    navigate(`/clientes/${id}/orcamento`)
   }
 
   if (isLoading) return <div>Loading...</div>
@@ -78,8 +71,7 @@ export default function Clientes() {
                 <TableCell>{cliente.cnpjCpf}</TableCell>
                 <TableCell>{cliente.categoria}</TableCell>
                 <TableCell className="flex justify-center items-centers">
-                  <Button onClick={() => verPerfil(cliente._id)}>Ver perfil</Button>{' '}
-                  {/* Passando o ID para a navegação */}
+                  <Button onClick={() => verPerfil(cliente._id)}>Ver perfil</Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -87,7 +79,6 @@ export default function Clientes() {
         </Table>
       </div>
 
-      {/* Modal Novo Cliente */}
       <ModalNovoCliente
         open={openModal}
         onOpenChange={setOpenModal}

@@ -2,17 +2,32 @@ import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useItemCard } from '@/hooks/useItemCard' // Usando o hook correto para gerenciar itens
-import { ItemData } from '@/api/ItemCardService' // Tipos de dados do item
+import { useItemCard } from '@/hooks/useItemCard'
+
+interface ItemData {
+  codigo: string
+  materialName: string
+  medida: string
+  ncm: string
+  codigoFabrica: string
+  quantidade: number
+  precoUnitario: number
+  custoTotal?: number
+}
 
 interface ModalNovoItemProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   cardId: string
+  onSave: (newItem: ItemData) => Promise<void>
 }
 
-export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps) {
+export function ModalNovoItem({
+  open,
+  onOpenChange,
+  cardId,
+  onSave
+}: ModalNovoItemProps) {
   const [form, setForm] = useState({
     codigo: '',
     materialName: '',
@@ -22,9 +37,6 @@ export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps
     quantidade: '',
     precoUnitario: ''
   })
-
-  const queryClient = useQueryClient()
-  const { criarItem } = useItemCard(cardId) // Usando o hook para criar o item no card
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -43,9 +55,8 @@ export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps
     }
 
     try {
-      // Criando o item usando a mutação
-      await criarItem({ cardId, itemData: data })
-      onOpenChange(false) // Fechar o modal após sucesso
+      await onSave(data)
+      onOpenChange(false)
       setForm({
         codigo: '',
         materialName: '',
@@ -54,9 +65,10 @@ export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps
         codigoFabrica: '',
         quantidade: '',
         precoUnitario: ''
-      }) // Limpar os campos do formulário
+      })
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
+      alert('Erro ao adicionar item. Verifique os dados e tente novamente.')
     }
   }
 
@@ -67,6 +79,7 @@ export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps
     >
       <DialogContent className="space-y-4">
         <h2 className="text-lg font-semibold">Adicionar Novo Item</h2>
+
         {Object.entries(form).map(([key, value]) => (
           <div key={key}>
             <label
@@ -96,7 +109,6 @@ export function ModalNovoItem({ open, onOpenChange, cardId }: ModalNovoItemProps
           <Button
             onClick={handleSubmit}
             className="bg-blue-600 text-white"
-            disabled={false} // Se desejar adicionar um estado de loading, pode usar um `isLoading` aqui
           >
             Adicionar Item
           </Button>

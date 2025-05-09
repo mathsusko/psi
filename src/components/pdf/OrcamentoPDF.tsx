@@ -1,3 +1,4 @@
+
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 
 const fallbackBase64 =
@@ -13,10 +14,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.7,
     borderBottomColor: '#f0f0f0'
   },
-  prestador: {
-    flexDirection: 'row',
-    gap: 24
-  },
+  prestador: { flexDirection: 'row', gap: 24 },
   prestadorRow: { flexDirection: 'row', gap: 12 },
   prestadorTitle: { fontSize: 15 },
   prestadorInfoOne: { marginTop: 8 },
@@ -37,11 +35,7 @@ const styles = StyleSheet.create({
   infoClient: { marginTop: 8 },
   textClient: { fontSize: 8 },
   clientInfoTwo: { marginTop: 20 },
-  table: {
-    borderWidth: 0.7,
-    borderColor: '#000',
-    borderStyle: 'solid'
-  },
+  table: { borderWidth: 0.7, borderColor: '#000', borderStyle: 'solid' },
   tableHeader: {
     flexDirection: 'row',
     backgroundColor: '#f0f0f0',
@@ -95,17 +89,8 @@ const styles = StyleSheet.create({
     borderRightWidth: 0.5,
     borderColor: '#000'
   },
-  tableCellSix: {
-    width: '16.6%',
-    paddingVertical: 4,
-    paddingLeft: 6,
-    fontSize: 8
-  },
-  tableImage: {
-    width: 40,
-    height: 60,
-    objectFit: 'cover'
-  },
+  tableCellSix: { width: '16.6%', paddingVertical: 4, paddingLeft: 6, fontSize: 8 },
+  tableImage: { width: 40, height: 60, objectFit: 'cover' },
   totalsTable: {
     width: 'auto',
     borderWidth: 0.7,
@@ -115,11 +100,7 @@ const styles = StyleSheet.create({
     marginBottom: 12
   },
   totalsRow: { flexDirection: 'row' },
-  totalsCell: {
-    padding: 4,
-    fontSize: 9,
-    textAlign: 'center'
-  },
+  totalsCell: { padding: 4, fontSize: 9, textAlign: 'center' },
   cell1: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
   cell2: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
   cell3: { width: '20%', borderRightWidth: 0.7, borderColor: '#000' },
@@ -149,12 +130,51 @@ const styles = StyleSheet.create({
   assText: { fontSize: 12 }
 })
 
-export const OrcamentoPDF = ({ orcamento }) => {
+interface OrcamentoItem {
+  nome: string
+  medida: string
+  quantidade: number
+  precoUn: number
+  imagemBase64?: string
+}
+
+interface Cliente {
+  nomeEmpresa: string
+  cnpjCpf: string
+  ie: string
+  email: string
+  telefone: string
+  endereco: string
+  numeroEndereco: string
+  cidade: string
+  estado: string
+}
+
+interface Prestador {
+  nomeEmpresa: string
+  cnpj: string
+  ie: string
+  email: string
+  telefone: string
+  endereco: string
+  numeroEndereco: string
+  cidade: string
+  estado: string
+}
+
+interface Orcamento {
+  clienteId: Cliente
+  prestadorId: Prestador
+  dataInicio: string
+  dataSaida: string
+  itens: OrcamentoItem[]
+}
+
+export const OrcamentoPDF = ({ orcamento }: { orcamento: Orcamento }) => {
   const totalItens = orcamento.itens?.reduce(
     (acc, item) => acc + item.quantidade * item.precoUn,
     0
   )
-  console.log(orcamento.clienteId)
 
   return (
     <Document>
@@ -162,7 +182,7 @@ export const OrcamentoPDF = ({ orcamento }) => {
         size="A4"
         style={styles.page}
       >
-        {/* Prestador */}
+        {/* Header */}
         <View style={styles.sectionHeader}>
           <Image
             src={fallbackBase64}
@@ -170,7 +190,7 @@ export const OrcamentoPDF = ({ orcamento }) => {
           />
           <View style={styles.prestador}>
             <View style={styles.prestadorRow}>
-              <View style={styles}>
+              <View>
                 <Text style={styles.prestadorTitle}>
                   {orcamento.prestadorId?.nomeEmpresa}
                 </Text>
@@ -202,7 +222,7 @@ export const OrcamentoPDF = ({ orcamento }) => {
           </View>
         </View>
 
-        {/* Cliente e datas */}
+        {/* Cliente + Datas */}
         <View style={styles.sectionHeaderCliente}>
           <View style={styles.details}>
             <Text style={styles.titleDetail}>Detalhes do Orçamento</Text>
@@ -247,7 +267,7 @@ export const OrcamentoPDF = ({ orcamento }) => {
           </View>
         </View>
 
-        {/* Tabela */}
+        {/* Tabela de Itens */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
             <Text style={styles.tableCellOne}>Imagem</Text>

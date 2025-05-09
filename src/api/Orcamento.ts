@@ -7,6 +7,7 @@ export interface OrcamentoDTO {
   custo?: number
   dataInicio?: string
   dataSaida?: string
+  descricaoServico?: string // ✅ Corrigido: adicionado ao DTO
 }
 
 // Tipo retornado com campos completos (inclusive populate)
@@ -29,6 +30,7 @@ export interface OrcamentoResponse {
   custo: number
   dataInicio: string
   dataSaida: string
+  descricaoServico?: string // ✅ Corrigido: incluído na resposta também
   createdAt: string
   updatedAt: string
   __v?: number

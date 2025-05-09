@@ -1,7 +1,7 @@
-// src/pages/app/estoque/itensDoCardPage.tsx
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useItemCard } from '@/hooks/useItemCard'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -16,20 +16,19 @@ import { ModalEditarItem } from './components/ModalEditarItem'
 import { ModalNovoItem } from './components/ModalNovoItem'
 
 export default function ItensDoCardPage() {
-  const { id } = useParams() // Obtendo o ID do parâmetro da rota
+  const { id } = useParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const [openModal, setOpenModal] = useState(false)
   const [openEditModal, setOpenEditModal] = useState(false)
   const [itemToEdit, setItemToEdit] = useState<any>(null)
 
-  // Verifique se o id está presente antes de passar para o hook
   if (!id) {
-    return <div>Erro: ID do card não encontrado.</div> // Exibe um erro se o id não for encontrado
+    return <div>Erro: ID do card não encontrado.</div>
   }
 
-  const { itens, isLoading, isError, criarItem, editarItem, deletarItem, queryClient } =
-    useItemCard(id) // Passando o ID validado para o hook
+  const { itens, isLoading, isError, criarItem, deletarItem } = useItemCard(id)
 
   const handleEditItem = (item: any) => {
     setItemToEdit(item)
@@ -38,10 +37,6 @@ export default function ItensDoCardPage() {
 
   const handleAddItem = async (newItem: any) => {
     try {
-      if (!id) {
-        alert('ID do card não encontrado.')
-        return
-      }
       await criarItem({ cardId: id, itemData: newItem })
       setOpenModal(false)
     } catch (error) {
@@ -51,10 +46,8 @@ export default function ItensDoCardPage() {
 
   const handleDeleteItem = async (itemId: string) => {
     try {
-      if (id) {
-        await deletarItem({ cardId: id, itemId })
-        queryClient.invalidateQueries(['itens-card', id])
-      }
+      await deletarItem({ cardId: id, itemId })
+      queryClient.invalidateQueries({ queryKey: ['itens-card', id] })
     } catch (error) {
       console.error('Erro ao excluir item:', error)
     }
@@ -66,9 +59,7 @@ export default function ItensDoCardPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">
-          {itens?.[0]?.cardNome ?? 'Itens do Card'}
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground">Itens do Card</h1>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -101,8 +92,8 @@ export default function ItensDoCardPage() {
           </TableHeader>
 
           <TableBody>
-            {itens?.map((item) => (
-              <TableRow key={item._id}>
+            {itens?.map((item: any, index) => (
+              <TableRow key={index}>
                 <TableCell>{item.materialName}</TableCell>
                 <TableCell>{item.medida}</TableCell>
                 <TableCell>{item.ncm}</TableCell>
@@ -122,7 +113,7 @@ export default function ItensDoCardPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleDeleteItem(item._id)}
+                      onClick={() => handleDeleteItem(item._id ?? '')}
                     >
                       <TrashIcon />
                     </Button>
@@ -138,14 +129,14 @@ export default function ItensDoCardPage() {
         open={openEditModal}
         onOpenChange={setOpenEditModal}
         item={itemToEdit}
-        onSave={() => queryClient.invalidateQueries(['itens-card', id])}
+        onSave={() => queryClient.invalidateQueries({ queryKey: ['itens-card', id] })}
       />
 
       <ModalNovoItem
         open={openModal}
         onOpenChange={setOpenModal}
         cardId={id}
-        onSave={handleAddItem}
+        onSave={handleAddItem} // <- esse prop precisa ser declarado na interface do componente
       />
     </div>
   )

@@ -1,6 +1,4 @@
-import { Shell } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
-import bg from '@/assets/background.png'
 import logo from '@/assets/logo.png'
 
 export function AuthLayout() {

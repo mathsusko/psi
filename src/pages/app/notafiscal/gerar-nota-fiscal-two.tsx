@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
-import { DatePickerDemo } from '@/components/ui/date-picker'
+// ✅ DatePickerDemo removido
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
@@ -15,61 +15,38 @@ export function GerarNotaFiscalTwo() {
       <Helmet title="Gerar Nota Fiscal Two" />
       <div className="flex items-center justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
         <h1 className="text-sm font-bold tracking-tight">Gerar nota fiscal</h1>
-
         <Progress
           value={50}
           className="w-[30%]"
         />
       </div>
-      {/* primeira linha */}
+
       <div className="flex flex-col p-4 gap-4 rounded-xl bg-sidebar text-sidebar-foreground">
         <span>Local da prestação do serviço</span>
-
         <div className="flex gap-4 *:justify-between">
           <div className="w-full">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
-              País
-            </label>
+            <label className="px-1">País</label>
             <Input />
           </div>
           <div className="w-full">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
-              Munícipio
-            </label>
+            <label className="px-1">Munícipio</label>
             <Input />
           </div>
         </div>
       </div>
 
-      {/* segunda linha */}
       <div className="flex flex-col gap-4 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
         <span>Serviço prestado</span>
         <div className="flex justify-between gap-4">
           <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
-              Código de Tributação Nacional
-            </label>
+            <label className="px-1">Código de Tributação Nacional</label>
             <Input />
           </div>
         </div>
 
         <div className="flex justify-between gap-6">
           <div className="w-full flex flex-col gap-4">
-            <label
-              htmlFor="Cep"
-              className="px-1"
-            >
-              Munícipio
-            </label>
+            <label className="px-1">Munícipio</label>
             <RadioGroup defaultValue="option-one">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
@@ -95,49 +72,26 @@ export function GerarNotaFiscalTwo() {
             </RadioGroup>
           </div>
         </div>
-        <label
-          htmlFor="Cep"
-          className="px-1"
-        >
-          Descrição do serviço
-        </label>
+
+        <label className="px-1">Descrição do serviço</label>
         <Textarea />
       </div>
 
-      {/* terceira linha */}
       <div className="flex flex-col gap-4 justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
         <span>Informações complementares</span>
         <div className="flex flex-col gap-4 justify-between">
           <div className="w-full flex flex-col gap-2">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
+            <label className="px-1">
               Número do documento de responsabilidade técnica
             </label>
-
             <Input />
           </div>
-
           <div className="w-full flex flex-col gap-2">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
-              Documento de referência
-            </label>
-
+            <label className="px-1">Documento de referência</label>
             <Input />
           </div>
-
           <div className="w-full flex flex-col gap-2">
-            <label
-              htmlFor="Nome/Razão Social"
-              className="px-1"
-            >
-              Informações complementares
-            </label>
-
+            <label className="px-1">Informações complementares</label>
             <Textarea />
           </div>
         </div>

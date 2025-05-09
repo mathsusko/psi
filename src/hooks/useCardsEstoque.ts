@@ -3,12 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import CardEstoqueService from '../api/CardEstoqueService'
 
 // Tipos de dados para o Card
-interface CardData {
-  nome?: string // Permitir campos opcionais
-  categoria?: string
-  imagem?: File
-  imagemUrl?: string // Adicionando imagemUrl para manter a imagem atual
-}
+// interface CardData {
+//   nome?: string // Permitir campos opcionais
+//   categoria?: string
+//   imagem?: File
+//   imagemUrl?: string // Adicionando imagemUrl para manter a imagem atual
+// }
 
 // Hook para gerenciar os Cards
 export function useCardsEstoque() {

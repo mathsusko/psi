@@ -3,7 +3,6 @@ import logo from '@/assets/logo.png'
 import * as React from 'react'
 import {
   AudioWaveform,
-  BookOpen,
   Box,
   Command,
   DollarSign,
@@ -17,7 +16,7 @@ import {
 import { NavMain } from '@/components/nav-main'
 // import { NavProjects } from '@/components/nav-projects'
 import { NavUser } from '@/components/nav-user'
-import { TeamSwitcher } from '@/components/team-switcher'
+// import { TeamSwitcher } from '@/components/team-switcher'
 import {
   Sidebar,
   SidebarContent,
@@ -31,7 +30,7 @@ const data = {
   user: {
     name: 'Gustavo',
     email: 'contato@psi.com',
-    avatar: { logo }
+    avatar: logo
   },
   teams: [
     {
@@ -56,20 +55,6 @@ const data = {
       url: '/',
       icon: SquareTerminal,
       isActive: true
-      // items: [
-      //   {
-      //     title: 'History',
-      //     url: '/'
-      //   },
-      //   {
-      //     title: 'Starred',
-      //     url: '/'
-      //   },
-      //   {
-      //     title: 'Settings',
-      //     url: '/'
-      //   }
-      // ]
     },
     {
       title: 'Estoque',
@@ -107,23 +92,6 @@ const data = {
       icon: Settings2
     }
   ]
-  // projects: [
-  //   {
-  //     name: 'Design Engineering',
-  //     url: '#',
-  //     icon: Frame
-  //   },
-  //   {
-  //     name: 'Sales & Marketing',
-  //     url: '#',
-  //     icon: PieChart
-  //   },
-  //   {
-  //     name: 'Travel',
-  //     url: '#',
-  //     icon: Map
-  //   }
-  // ]
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -132,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       collapsible="icon"
       {...props}
     >
-      <SidebarHeader className=" p-4 flex flex-row items-center">
+      <SidebarHeader className="p-4 flex flex-row items-center">
         <img
           className="w-[32px]"
           src={logo}

@@ -19,8 +19,6 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { DialogRegister } from './dialog-register'
 
 export function EditPecaPorQtd() {
-  const [expandedRow, setExpandedRow] = useState<number | null>(null)
-
   const data = [
     {
       id: 1,
@@ -64,7 +62,7 @@ export function EditPecaPorQtd() {
             src={photo}
             alt="photo"
           />
-          <div className="bg-sidebar-foregound flex w-full flex-col gap-2 p-2 border">
+          <div className="bg-sidebar-foreground flex w-full flex-col gap-2 p-2 border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -79,20 +77,22 @@ export function EditPecaPorQtd() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell>01</TableCell>
-                  <TableCell>Cotovelo Fe.</TableCell>
-                  <TableCell>6"</TableCell>
-                  <TableCell>6000</TableCell>
-                  <TableCell>5006</TableCell>
-                  <TableCell className="flex gap-2">
-                    <Minus />
-                    12
-                    <Plus />
-                  </TableCell>
-                  <TableCell>10,00</TableCell>
-                  <TableCell>120,00</TableCell>
-                </TableRow>
+                {data.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.codigo}</TableCell>
+                    <TableCell>{item.descricao}</TableCell>
+                    <TableCell>{item.medida}"</TableCell>
+                    <TableCell>{item.ncm}</TableCell>
+                    <TableCell>{item.codFabrica}</TableCell>
+                    <TableCell className="flex gap-2 items-center">
+                      <Minus />
+                      {item.quantidade}
+                      <Plus />
+                    </TableCell>
+                    <TableCell>{item.preco.toFixed(2)}</TableCell>
+                    <TableCell>{item.total.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
             <Dialog>
@@ -156,7 +156,7 @@ export function EditPecaPorQtd() {
         </Card>
       </div>
 
-      <div className="w-full flex justify-between">
+      <div className="w-full flex justify-between mt-4">
         <Button variant="outline">
           <NavLink
             to="/estoque"

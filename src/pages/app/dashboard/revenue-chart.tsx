@@ -34,7 +34,7 @@ export function RevenueChart() {
       <CardHeader className="flex-row items-center justify-between pb-8">
         <div className="space-y-1">
           <CardTitle className="text-base font-medium">Receita no período</CardTitle>
-          <CardDescription className="">Receita diária no período</CardDescription>
+          <CardDescription>Receita diária no período</CardDescription>
         </div>
       </CardHeader>
       <CardContent>
@@ -47,7 +47,7 @@ export function RevenueChart() {
             style={{ fontSize: 12 }}
           >
             <XAxis
-              dataKey="date"
+              dataKey="data"
               tickLine={false}
               axisLine={false}
               dy={16}
@@ -67,6 +67,7 @@ export function RevenueChart() {
               vertical={false}
               className="stroke-muted"
             />
+            <Tooltip />
             <Line
               type="linear"
               strokeWidth={2}

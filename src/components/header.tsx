@@ -1,9 +1,10 @@
-import { Codesandbox, Home, Shell } from 'lucide-react'
+import { Codesandbox, Home } from 'lucide-react' // ← Removido: Shell
 import { Separator } from './ui/separator'
 import { NavLink } from './nav-link'
 import { ThemeToggle } from './theme/theme.toggle'
 import { AccountMenu } from './account-menu'
 import { SidebarTrigger } from './ui/sidebar'
+
 export function Header() {
   return (
     <div className="border-b">

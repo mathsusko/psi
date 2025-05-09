@@ -9,6 +9,7 @@ interface ModalEditarCardProps {
   onOpenChange: (v: boolean) => void
   id: string
   nome: string
+  categoria: string
   imagemUrl: string
 }
 
@@ -17,6 +18,7 @@ const ModalEditarCard = ({
   onOpenChange,
   id,
   nome,
+  categoria,
   imagemUrl
 }: ModalEditarCardProps) => {
   const [novoNome, setNovoNome] = useState(nome)
@@ -30,19 +32,19 @@ const ModalEditarCard = ({
 
   const handleSubmit = async () => {
     if (!novoNome) {
-      console.error('Nome não pode estar vazio!')
       alert('Nome não pode estar vazio!')
       return
     }
 
     const updatedCard = {
-      nome: novoNome, // Nome atualizado
-      imagem: novaImagem || imagemUrl // Se não houver nova imagem, usa a imagem atual
+      nome: novoNome,
+      categoria,
+      imagem: novaImagem || undefined
     }
 
     try {
-      await editarCard(id, updatedCard) // Passa o ID e os dados para a função editar
-      onOpenChange(false) // Fecha o modal após sucesso
+      await editarCard({ id, data: updatedCard })
+      onOpenChange(false)
     } catch (error) {
       console.error('Erro ao editar card:', error)
       alert('Erro ao editar card. Tente novamente.')
@@ -56,6 +58,7 @@ const ModalEditarCard = ({
     >
       <DialogContent>
         <DialogTitle>Editar Card</DialogTitle>
+
         <div className="mt-4">
           <label htmlFor="nome">Nome:</label>
           <Input
@@ -69,7 +72,7 @@ const ModalEditarCard = ({
           <label htmlFor="categoria">Categoria:</label>
           <Input
             id="categoria"
-            value="Un" // Categoria fixa
+            value={categoria}
             readOnly
             disabled
           />

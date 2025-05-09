@@ -43,10 +43,7 @@ export function NotasFiscaisLista() {
               <TableHead className="text-muted-foreground">Emitida de</TableHead>
               <TableHead className="text-muted-foreground">Emitida para</TableHead>
               <TableHead className="text-muted-foreground">Valor</TableHead>
-
-              <TableHead className="text-muted-foreground flex items-center justify-center">
-                Ações
-              </TableHead>
+              <TableHead className="text-muted-foreground text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -56,7 +53,6 @@ export function NotasFiscaisLista() {
               <TableCell className="">42.000.00/00001-90 Psi Previncendio</TableCell>
               <TableCell className="">42.000.00/00001-90 Cliente</TableCell>
               <TableCell className="">Condor</TableCell>
-
               <TableCell className="flex items-center justify-center gap-4">
                 <Eye size="22" />
                 <Download />
@@ -64,7 +60,12 @@ export function NotasFiscaisLista() {
             </TableRow>
           </TableBody>
         </Table>
-        <Pagination />
+
+        <Pagination
+          pageIndex={1}
+          totalCount={1}
+          perPage={10}
+        />
       </div>
     </>
   )

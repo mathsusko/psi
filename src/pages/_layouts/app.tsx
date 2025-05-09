@@ -1,8 +1,8 @@
 import { AppSidebar } from '@/components/app-sidebar'
-import { Header } from '@/components/header'
+// Removido: import { Header } from '@/components/header'
 import { ThemeToggle } from '@/components/theme/theme.toggle'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator } from '@radix-ui/react-separator'
+// import { Separator } from '@radix-ui/react-separator'
 import { Outlet } from 'react-router-dom'
 
 export function AppLayout() {

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Plus, X } from 'lucide-react'
 import photo from '@/assets/photo.png'
@@ -19,33 +18,6 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { DialogRegister } from './dialog-register'
 
 export function AddPecaPorQtd() {
-  const [expandedRow, setExpandedRow] = useState<number | null>(null)
-
-  const data = [
-    {
-      id: 1,
-      codigo: '01',
-      descricao: 'Cotovelo Fe.',
-      medida: '6',
-      ncm: '6000',
-      codFabrica: '5006',
-      quantidade: 12,
-      preco: 10,
-      total: 120
-    },
-    {
-      id: 2,
-      codigo: '01',
-      descricao: 'Curva',
-      medida: '4',
-      ncm: '6000',
-      codFabrica: '5006',
-      quantidade: 10,
-      preco: 10,
-      total: 100
-    }
-  ]
-
   return (
     <>
       <Helmet title="Adicione Peça por QTD." />

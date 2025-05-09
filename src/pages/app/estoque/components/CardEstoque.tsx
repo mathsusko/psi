@@ -39,7 +39,6 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
   const { deletarCard, editarCard } = useCardsEstoque()
   const { itens } = useItemCard(id)
 
-  // Buscar quantidade de itens do card
   useEffect(() => {
     const total = itens?.reduce(
       (acc: number, item: any) => acc + Number(item.quantidade || 0),
@@ -48,17 +47,19 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
     setQuantidadeTotal(total || 0)
   }, [itens])
 
-  // Salvar edição
   const handleSave = async (
     novoNome: string,
     novaCategoria: string,
     novaImagem?: File
   ) => {
     try {
-      const response = await editarCard(id, {
-        nome: novoNome,
-        categoria: novaCategoria,
-        imagem: novaImagem
+      const response = await editarCard({
+        id,
+        data: {
+          nome: novoNome,
+          categoria: novaCategoria, // agora aceita
+          imagem: novaImagem
+        }
       })
 
       setNomeEditado(response.data.nome)
@@ -69,7 +70,6 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
     }
   }
 
-  // Confirmar exclusão
   const handleConfirmDelete = async () => {
     try {
       setIsLoadingDelete(true)

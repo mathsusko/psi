@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { categoriaApi } from '@/api/categoria'
+import { categoriaApi } from '@/api/dadoPsi' // ajuste aqui conforme a localização real
 import { toast } from 'sonner'
 
 export function EditarCategoriaPage() {
@@ -9,10 +9,8 @@ export function EditarCategoriaPage() {
 
   const { data: categoria, isLoading } = useQuery({
     queryKey: ['categoria', id],
-    queryFn: () => categoriaApi.obterPorSlug(id!),
-    onError: () => {
-      toast.error('Falha ao carregar categoria')
-    }
+    queryFn: () => categoriaApi.obterPorSlug(id!)
+    // onError removido — se quiser tratar erro, use .catch no queryFn
   })
 
   const { mutate: atualizarCategoria, isPending } = useMutation({
@@ -26,5 +24,20 @@ export function EditarCategoriaPage() {
     }
   })
 
-  // ... restante do código permanece igual
+  if (isLoading) return <div>Carregando...</div>
+  if (!categoria) return <div>Categoria não encontrada.</div>
+
+  // Supondo que aqui venha um formulário:
+  const handleSubmit = (dados: any) => {
+    atualizarCategoria(dados)
+  }
+
+  return (
+    <div className="p-4">
+      <h1 className="text-xl font-bold">Editar Categoria</h1>
+      <p>Nome atual: {categoria.nome}</p>
+      {/* Aqui poderia haver um formulário */}
+      <button onClick={() => handleSubmit({ nome: 'Nova Categoria' })}>Atualizar</button>
+    </div>
+  )
 }

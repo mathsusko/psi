@@ -20,7 +20,7 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
   const [form, setForm] = useState({
     nomeEmpresa: '',
     cnpjCpf: '',
-    categoria: '', // Categoria (Matriz ou Filial)
+    categoria: '',
     email: '',
     telefone: '',
     endereco: '',
@@ -35,15 +35,12 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
 
   const queryClient = useQueryClient()
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: async () => {
-      const data = {
-        ...form
-      }
-      return await ClientesService.criar(data)
+      return await ClientesService.criar(form)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['clientes'])
+      queryClient.invalidateQueries({ queryKey: ['clientes'] })
       toast.success('Cliente criado com sucesso!')
       onOpenChange(false)
       setForm({
@@ -184,9 +181,9 @@ export function ModalNovoCliente({ open, onOpenChange }: ModalNovoClienteProps) 
 
         <Button
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={isPending}
         >
-          {isLoading ? 'Adicionando...' : 'Adicionar Cliente'}
+          {isPending ? 'Adicionando...' : 'Adicionar Cliente'}
         </Button>
       </DialogContent>
     </Dialog>

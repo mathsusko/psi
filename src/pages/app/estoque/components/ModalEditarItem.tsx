@@ -1,9 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useItemCard } from '@/hooks/useItemCard'
-import { ItemData } from '@/api/ItemCardService'
+
+interface ItemData {
+  _id: string
+  cardId: string
+  codigo: string
+  materialName: string
+  medida: string
+  ncm: string
+  codigoFabrica: string
+  quantidade: number
+  precoUnitario: number
+  custoTotal?: number
+}
 
 interface ModalEditarItemProps {
   open: boolean
@@ -61,6 +73,8 @@ export function ModalEditarItem({
     }
 
     const updatedData: ItemData = {
+      _id: item._id,
+      cardId: item.cardId,
       codigo,
       materialName,
       medida,
@@ -71,10 +85,9 @@ export function ModalEditarItem({
     }
 
     const changes: Partial<ItemData> = {}
-
     Object.keys(updatedData).forEach((key) => {
-      if (updatedData[key] !== item[key as keyof ItemData]) {
-        changes[key as keyof ItemData] = updatedData[key]
+      if (updatedData[key as keyof ItemData] !== item[key as keyof ItemData]) {
+        changes[key as keyof ItemData] = updatedData[key as keyof ItemData]
       }
     })
 
@@ -84,24 +97,21 @@ export function ModalEditarItem({
     }
 
     try {
-      // Adicionei log para inspecionar os dados antes de enviar
-      console.log('Dados enviados para editar:', {
-        itemId: item._id,
-        updatedData: changes
-      })
-
       await editarItem({
         cardId: item.cardId,
         itemId: item._id,
         updatedData: changes
       })
 
-      onSave() // Notifica o componente pai que a edição foi salva
-      onOpenChange(false) // Fecha o modal após a edição ser salva com sucesso
+      onSave()
+      onOpenChange(false)
     } catch (error) {
-      // Alterado para mostrar mensagem de erro mais detalhada
       console.error('Erro ao salvar item:', error)
-      alert('Erro ao salvar o item. Tente novamente. Erro: ' + error.message) // Inclui a mensagem de erro
+      if (error instanceof Error) {
+        alert('Erro ao salvar o item. Tente novamente. Erro: ' + error.message)
+      } else {
+        alert('Erro desconhecido ao salvar o item.')
+      }
     }
   }
 

@@ -3,10 +3,10 @@ import { useParams, NavLink } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Edit, Download, X } from 'lucide-react'
+import { Download, X } from 'lucide-react' // ✅ Edit removido
 import { getOrcamento } from '@/api/Orcamento'
 import { PDFDownloadLink } from '@react-pdf/renderer'
-import { OrcamentoServicoPDF } from '@/components/pdf/OrcamentoServicoPDF' // Importando o componente para PDF
+import { OrcamentoServicoPDF } from '@/components/pdf/OrcamentoServicoPDF'
 
 export function PrevisualizacaoOrcamentoDeServicos() {
   const { id } = useParams()
@@ -139,7 +139,6 @@ export function PrevisualizacaoOrcamentoDeServicos() {
           </Button>
         </NavLink>
 
-        {/* Gerar PDF */}
         <PDFDownloadLink
           document={<OrcamentoServicoPDF orcamento={orcamento} />}
           fileName={`orcamento-servico-${orcamento._id}.pdf`}

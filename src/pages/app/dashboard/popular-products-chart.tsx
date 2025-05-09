@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import colors from 'tailwindcss/colors'
 
@@ -76,15 +70,13 @@ export function PopularProductsChart() {
                 )
               }}
             >
-              {data.map((_, index) => {
-                return (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index]}
-                    className="stroke-transparent hover:opacity-80"
-                  />
-                )
-              })}
+              {data.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index]}
+                  className="stroke-transparent hover:opacity-80"
+                />
+              ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>

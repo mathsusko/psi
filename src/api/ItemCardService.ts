@@ -1,10 +1,9 @@
-// src/api/ItemCardService.ts
 import axios from 'axios'
 
 const API_URL = 'http://localhost:3333/api/cards'
 
 // Tipagem para os dados de um item
-interface ItemData {
+export interface ItemData {
   codigo: string
   materialName: string
   medida: string
@@ -12,6 +11,8 @@ interface ItemData {
   codigoFabrica: string
   quantidade: number
   precoUnitario: number
+  precoCusto: number // <- NOVO CAMPO
+  custoTotal?: number
 }
 
 // Funções para itens dentro de um card

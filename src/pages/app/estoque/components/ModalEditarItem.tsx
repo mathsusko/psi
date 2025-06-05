@@ -7,13 +7,12 @@ import { useItemCard } from '@/hooks/useItemCard'
 interface ItemData {
   _id: string
   cardId: string
-  codigo: string
   materialName: string
   medida: string
   ncm: string
-  codigoFabrica: string
   quantidade: number
   precoUnitario: number
+  precoCusto: number
   custoTotal?: number
 }
 
@@ -44,44 +43,36 @@ export function ModalEditarItem({
     )
   }
 
-  const [codigo, setCodigo] = useState(item.codigo || '')
   const [materialName, setmaterialName] = useState(item.materialName || '')
   const [medida, setMedida] = useState(item.medida || '')
   const [ncm, setNcm] = useState(item.ncm || '')
-  const [codigoFabrica, setCodigoFabrica] = useState(item.codigoFabrica || '')
   const [quantidade, setQuantidade] = useState(item.quantidade || 0)
   const [precoUnitario, setPrecoUnitario] = useState(item.precoUnitario || 0)
+  const [precoCusto, setPrecoCusto] = useState(item.precoCusto || 0)
 
   const { editarItem } = useItemCard(item.cardId)
 
   useEffect(() => {
     if (item) {
-      setCodigo(item.codigo)
       setmaterialName(item.materialName)
       setMedida(item.medida)
       setNcm(item.ncm)
-      setCodigoFabrica(item.codigoFabrica)
       setQuantidade(item.quantidade)
       setPrecoUnitario(item.precoUnitario)
+      setPrecoCusto(item.precoCusto || 0)
     }
   }, [item])
 
   const handleSave = async () => {
-    if (!codigo || !materialName || !quantidade || !precoUnitario) {
-      alert('Por favor, preencha todos os campos obrigatórios.')
-      return
-    }
-
     const updatedData: ItemData = {
       _id: item._id,
       cardId: item.cardId,
-      codigo,
       materialName,
       medida,
       ncm,
-      codigoFabrica,
       quantidade,
-      precoUnitario
+      precoUnitario,
+      precoCusto
     }
 
     const changes: Partial<ItemData> = {}
@@ -107,11 +98,7 @@ export function ModalEditarItem({
       onOpenChange(false)
     } catch (error) {
       console.error('Erro ao salvar item:', error)
-      if (error instanceof Error) {
-        alert('Erro ao salvar o item. Tente novamente. Erro: ' + error.message)
-      } else {
-        alert('Erro desconhecido ao salvar o item.')
-      }
+      alert('Erro ao salvar o item. Tente novamente.')
     }
   }
 
@@ -122,15 +109,6 @@ export function ModalEditarItem({
     >
       <DialogContent>
         <h2 className="text-lg font-semibold">Editar Item</h2>
-
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">Código</label>
-          <Input
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-            className="mt-2"
-          />
-        </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700">Material</label>
@@ -160,17 +138,6 @@ export function ModalEditarItem({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Código de Fábrica
-          </label>
-          <Input
-            value={codigoFabrica}
-            onChange={(e) => setCodigoFabrica(e.target.value)}
-            className="mt-2"
-          />
-        </div>
-
-        <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700">Quantidade</label>
           <Input
             type="number"
@@ -192,7 +159,19 @@ export function ModalEditarItem({
           />
         </div>
 
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Preço de Custo
+          </label>
+          <Input
+            type="number"
+            value={precoCusto}
+            onChange={(e) => setPrecoCusto(Number(e.target.value))}
+            className="mt-2"
+          />
+        </div>
+
+        <div className="mt-6 flex justify-end gap-2">
           <Button
             onClick={() => onOpenChange(false)}
             variant="secondary"

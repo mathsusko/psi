@@ -2,16 +2,14 @@ import { useState } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useItemCard } from '@/hooks/useItemCard'
 
 interface ItemData {
-  codigo: string
   materialName: string
   medida: string
   ncm: string
-  codigoFabrica: string
   quantidade: number
   precoUnitario: number
+  precoCusto: number
   custoTotal?: number
 }
 
@@ -29,13 +27,12 @@ export function ModalNovoItem({
   onSave
 }: ModalNovoItemProps) {
   const [form, setForm] = useState({
-    codigo: '',
     materialName: '',
     medida: '',
     ncm: '',
-    codigoFabrica: '',
     quantidade: '',
-    precoUnitario: ''
+    precoUnitario: '',
+    precoCusto: ''
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,26 +42,24 @@ export function ModalNovoItem({
 
   const handleSubmit = async () => {
     const data: ItemData = {
-      codigo: form.codigo,
       materialName: form.materialName,
       medida: form.medida,
       ncm: form.ncm,
-      codigoFabrica: form.codigoFabrica,
       quantidade: Number(form.quantidade),
-      precoUnitario: Number(form.precoUnitario)
+      precoUnitario: Number(form.precoUnitario),
+      precoCusto: Number(form.precoCusto)
     }
 
     try {
       await onSave(data)
       onOpenChange(false)
       setForm({
-        codigo: '',
         materialName: '',
         medida: '',
         ncm: '',
-        codigoFabrica: '',
         quantidade: '',
-        precoUnitario: ''
+        precoUnitario: '',
+        precoCusto: ''
       })
     } catch (error) {
       console.error('Erro ao adicionar item:', error)
@@ -86,7 +81,9 @@ export function ModalNovoItem({
               className="block text-sm font-medium text-gray-700"
               htmlFor={key}
             >
-              {key[0].toUpperCase() + key.slice(1)}
+              {key === 'precoCusto'
+                ? 'Preço de Custo'
+                : key[0].toUpperCase() + key.slice(1)}
             </label>
             <Input
               id={key}

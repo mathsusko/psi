@@ -29,7 +29,6 @@ export default function Orcamento() {
 
   return (
     <div className="flex flex-col gap-4">
-      <span className="text-xl">Orçamentos</span>
       <Table>
         <TableHeader>
           <TableRow>

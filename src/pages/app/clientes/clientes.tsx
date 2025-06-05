@@ -38,10 +38,10 @@ export default function Clientes() {
   }
 
   const verPerfil = (id: string) => {
-    navigate(`/clientes/${id}/orcamento`)
+    navigate(`/clientes/${id}/filiais`)
   }
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <div>Carregando...</div>
   if (isError) return <div>Erro ao carregar clientes</div>
 
   return (
@@ -58,8 +58,6 @@ export default function Clientes() {
           <TableHeader>
             <TableRow>
               <TableHead>Nome da empresa</TableHead>
-              <TableHead>CNPJ/CPF</TableHead>
-              <TableHead>Categoria</TableHead>
               <TableHead className="flex justify-center items-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -68,9 +66,7 @@ export default function Clientes() {
             {clientes.map((cliente: any) => (
               <TableRow key={cliente._id}>
                 <TableCell>{cliente.nomeEmpresa}</TableCell>
-                <TableCell>{cliente.cnpjCpf}</TableCell>
-                <TableCell>{cliente.categoria}</TableCell>
-                <TableCell className="flex justify-center items-centers">
+                <TableCell className="flex justify-center items-center">
                   <Button onClick={() => verPerfil(cliente._id)}>Ver perfil</Button>
                 </TableCell>
               </TableRow>

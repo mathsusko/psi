@@ -1,48 +1,113 @@
-import axios from 'axios'
+// import { api } from '@/lib/axios'
 
-const API_URL = 'http://localhost:3333/api/clientes'
+// export interface Cliente {
+//   _id?: string
+//   nomeEmpresa: string
+//   cnpjCpf?: string
+//   endereco?: string
+//   numeroEndereco?: string
+//   complemento?: string
+//   bairro?: string
+//   cep?: string
+//   cidade?: string
+//   estado?: string
+//   email?: string
+//   telefone?: string
+//   categoria?: string
+//   ie?: string
+//   clientePaiId?: string | null
+//   createdAt?: string
+//   updatedAt?: string
+// }
 
-// Função para listar clientes
-const listarClientes = async () => axios.get(API_URL).then((res) => res.data)
+// const BASE_URL = '/clientes'
 
-// Função para criar cliente
-const criarCliente = async (clienteData: {
+// const ClientesService = {
+//   listar: async (): Promise<Cliente[]> => {
+//     const response = await api.get(BASE_URL)
+//     return response.data
+//   },
+
+//   criar: async (dados: Cliente): Promise<Cliente> => {
+//     const response = await api.post(BASE_URL, dados)
+//     return response.data.data
+//   },
+
+//   editar: async (id: string, dados: Partial<Cliente>): Promise<Cliente> => {
+//     const response = await api.put(`${BASE_URL}/${id}`, dados)
+//     return response.data.data
+//   },
+
+//   deletar: async (id: string): Promise<void> => {
+//     await api.delete(`${BASE_URL}/${id}`)
+//   },
+
+//   buscarPorId: async (id: string): Promise<Cliente> => {
+//     const response = await api.get(`${BASE_URL}/${id}`)
+//     return response.data
+//   },
+
+//   listarPorClientePai: async (clientePaiId: string): Promise<Cliente[]> => {
+//     const response = await api.get(`${BASE_URL}/filiais/${clientePaiId}`)
+//     return response.data
+//   }
+// }
+
+// export default ClientesService
+
+// src/api/clientes.ts
+import { api } from '@/lib/axios'
+
+export interface Cliente {
+  _id?: string
   nomeEmpresa: string
-  cnpjCpf: string
-  endereco: string
-  numeroEndereco: string
-  email: string
-  telefone: string
-  complemento: string
-  bairro: string
-  cep: string
-  cidade: string
-  estado: string
-  categoria: string
-}) => {
-  return axios.post(API_URL, clienteData).then((res) => res.data)
+  cnpjCpf?: string
+  endereco?: string
+  numeroEndereco?: string
+  complemento?: string
+  bairro?: string
+  cep?: string
+  cidade?: string
+  estado?: string
+  email?: string
+  telefone?: string
+  categoria?: string
+  ie?: string
+  clientePaiId?: string | null
+  createdAt?: string
+  updatedAt?: string
 }
 
-// Função para editar cliente
-const editarCliente = async (id: string, clienteData: any) => {
-  return axios.put(`${API_URL}/${id}`, clienteData).then((res) => res.data)
-}
+const BASE_URL = '/clientes'
 
-// Função para deletar cliente
-const deletarCliente = async (id: string) => {
-  return axios.delete(`${API_URL}/${id}`).then((res) => res.data)
-}
+export const ClientesService = {
+  listar: async (): Promise<Cliente[]> => {
+    const response = await api.get(BASE_URL)
+    return response.data
+  },
 
-const buscarClientePorId = async (id: string) => {
-  return axios.get(`${API_URL}/${id}`).then((res) => res.data)
-}
+  criar: async (dados: Cliente): Promise<Cliente> => {
+    const response = await api.post(BASE_URL, dados)
+    return response.data.data
+  },
 
-const ClientesService = {
-  listar: listarClientes,
-  criar: criarCliente,
-  editar: editarCliente,
-  deletar: deletarCliente,
-  buscarPorId: buscarClientePorId // ⬅️ nova função
-}
+  editar: async (id: string, dados: Partial<Cliente>): Promise<Cliente> => {
+    const response = await api.put(`${BASE_URL}/${id}`, dados)
+    return response.data.data
+  },
 
+  deletar: async (id: string): Promise<void> => {
+    await api.delete(`${BASE_URL}/${id}`)
+  },
+
+  buscarPorId: async (id: string): Promise<Cliente> => {
+    const response = await api.get(`${BASE_URL}/${id}`)
+    return response.data
+  },
+
+  listarPorClientePai: async (clientePaiId: string): Promise<Cliente[]> => {
+    const response = await api.get(`${BASE_URL}/filiais/${clientePaiId}`)
+    return response.data
+  }
+}
 export default ClientesService

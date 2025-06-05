@@ -6,7 +6,8 @@ import {
 } from '@tanstack/react-query'
 import ItemCardService from '../api/ItemCardService'
 
-interface ItemData {
+// Tipagem atualizada com precoCusto
+export interface ItemData {
   codigo: string
   materialName: string
   medida: string
@@ -14,6 +15,7 @@ interface ItemData {
   codigoFabrica: string
   quantidade: number
   precoUnitario: number
+  precoCusto: number // <- NOVO
   custoTotal?: number
 }
 
@@ -42,8 +44,11 @@ export function useItemCard(cardId: string) {
   })
 
   const { mutateAsync: editarItem } = useMutation({
-    mutationFn: (params: { cardId: string; itemId: string; updatedData: ItemData }) =>
-      ItemCardService.editarItem(params.cardId, params.itemId, params.updatedData),
+    mutationFn: (params: {
+      cardId: string
+      itemId: string
+      updatedData: Partial<ItemData>
+    }) => ItemCardService.editarItem(params.cardId, params.itemId, params.updatedData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['itens-card', cardId] })
     },
@@ -65,5 +70,12 @@ export function useItemCard(cardId: string) {
     }
   })
 
-  return { itens, criarItem, editarItem, deletarItem, isLoading, isError }
+  return {
+    itens,
+    criarItem,
+    editarItem,
+    deletarItem,
+    isLoading,
+    isError
+  }
 }

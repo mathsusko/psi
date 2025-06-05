@@ -88,7 +88,7 @@ const data = {
     },
     {
       title: 'Controle de Funcionário',
-      url: '#',
+      url: '/funcionarios',
       icon: Settings2
     }
   ]

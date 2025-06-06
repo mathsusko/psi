@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom' // ✅ Removido NavLink
+import { useParams } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getOrcamento } from '@/api/Orcamento'
-import { Download } from 'lucide-react' // ✅ Removido Edit
+import { Download } from 'lucide-react'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { OrcamentoPDF } from '@/components/pdf/OrcamentoPDF'
 
@@ -38,7 +38,7 @@ export function PrevisualizacaoOrcamentoDeMateriais() {
 
   if (loading || !orcamento) return <p className="p-4">Carregando...</p>
 
-  const renderDadoPsiInfo = (label: string, value?: string) => (
+  const renderInfo = (label: string, value?: string) => (
     <p>
       <strong>{label}:</strong> {value || '-'}
     </p>
@@ -53,39 +53,39 @@ export function PrevisualizacaoOrcamentoDeMateriais() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border p-3 rounded bg-muted">
-            <h2 className="font-semibold text-sm mb-2">Cliente</h2>
-            {renderDadoPsiInfo('Empresa', orcamento.clienteId?.nomeEmpresa)}
-            {renderDadoPsiInfo('Email', orcamento.clienteId?.email)}
-            {renderDadoPsiInfo('Telefone', orcamento.clienteId?.telefone)}
-            {renderDadoPsiInfo('CPF/CNPJ', orcamento.clienteId?.cnpj)}
-            {renderDadoPsiInfo(
+            <h2 className="font-semibold text-sm mb-2">Filial</h2>
+            {renderInfo('Empresa', orcamento.filialId?.nomeEmpresa)}
+            {renderInfo('Email', orcamento.filialId?.email)}
+            {renderInfo('Telefone', orcamento.filialId?.telefone)}
+            {renderInfo('CNPJ/CPF', orcamento.filialId?.cnpjCpf)}
+            {renderInfo(
               'Endereço',
-              `${orcamento.clienteId?.endereco}, ${orcamento.clienteId?.numeroEndereco}`
+              `${orcamento.filialId?.endereco}, ${orcamento.filialId?.numeroEndereco}`
             )}
-            {renderDadoPsiInfo(
+            {renderInfo(
               'Cidade',
-              `${orcamento.clienteId?.cidade} - ${orcamento.clienteId?.estado}`
+              `${orcamento.filialId?.cidade} - ${orcamento.filialId?.estado}`
             )}
-            {renderDadoPsiInfo('CEP', orcamento.clienteId?.cep)}
-            {renderDadoPsiInfo('IE', orcamento.clienteId?.ie)}
+            {renderInfo('CEP', orcamento.filialId?.cep)}
+            {renderInfo('IE', orcamento.filialId?.ie)}
           </div>
 
           <div className="border p-3 rounded bg-muted">
             <h2 className="font-semibold text-sm mb-2">Prestador</h2>
-            {renderDadoPsiInfo('Empresa', orcamento.prestadorId?.nomeEmpresa)}
-            {renderDadoPsiInfo('Email', orcamento.prestadorId?.email)}
-            {renderDadoPsiInfo('Telefone', orcamento.prestadorId?.telefone)}
-            {renderDadoPsiInfo('CPF/CNPJ', orcamento.prestadorId?.cnpj)}
-            {renderDadoPsiInfo(
+            {renderInfo('Empresa', orcamento.prestadorId?.nomeEmpresa)}
+            {renderInfo('Email', orcamento.prestadorId?.email)}
+            {renderInfo('Telefone', orcamento.prestadorId?.telefone)}
+            {renderInfo('CNPJ', orcamento.prestadorId?.cnpj)}
+            {renderInfo(
               'Endereço',
               `${orcamento.prestadorId?.endereco}, ${orcamento.prestadorId?.numeroEndereco}`
             )}
-            {renderDadoPsiInfo(
+            {renderInfo(
               'Cidade',
               `${orcamento.prestadorId?.cidade} - ${orcamento.prestadorId?.estado}`
             )}
-            {renderDadoPsiInfo('CEP', orcamento.prestadorId?.cep)}
-            {renderDadoPsiInfo('IE', orcamento.prestadorId?.ie)}
+            {renderInfo('CEP', orcamento.prestadorId?.cep)}
+            {renderInfo('IE', orcamento.prestadorId?.ie)}
           </div>
         </div>
 

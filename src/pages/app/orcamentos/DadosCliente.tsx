@@ -1,6 +1,6 @@
-// src/components/DadosCliente.tsx
 import { useEffect, useState } from 'react'
 import ClientesService from '@/api/clientes'
+import { getFiliais } from '@/api/filiais'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,74 +10,87 @@ import {
 import { ChevronDown } from 'lucide-react'
 
 interface Props {
-  onSelectCliente: (clienteId: string) => void
+  onSelectFilial: (filialId: string) => void
 }
 
-export function DadosCliente({ onSelectCliente }: Props) {
+export function DadosClienteFilial({ onSelectFilial }: Props) {
   const [clientes, setClientes] = useState<any[]>([])
-  const [selectedNome, setSelectedNome] = useState('')
+  const [filiais, setFiliais] = useState<any[]>([])
+
+  const [clienteSelecionado, setClienteSelecionado] = useState<any | null>(null)
+  const [filialSelecionada, setFilialSelecionada] = useState<any | null>(null)
 
   useEffect(() => {
     ClientesService.listar().then(setClientes).catch(console.error)
   }, [])
 
-  const handleClienteChange = (nomeEmpresa: string) => {
-    setSelectedNome(nomeEmpresa)
-    const cliente = clientes.find((c) => c.nomeEmpresa === nomeEmpresa)
-    if (cliente) onSelectCliente(cliente._id)
+  const handleClienteChange = async (cliente: any) => {
+    setClienteSelecionado(cliente)
+    setFilialSelecionada(null)
+    try {
+      const lista = await getFiliais(cliente._id)
+      setFiliais(lista.data)
+    } catch (err) {
+      console.error('Erro ao carregar filiais:', err)
+    }
   }
 
-  const renderClienteInfo = () => {
-    const cliente = clientes.find((c) => c.nomeEmpresa === selectedNome)
-    if (!cliente) return null
+  const handleFilialChange = (filial: any) => {
+    setFilialSelecionada(filial)
+    onSelectFilial(filial._id)
+  }
+
+  const renderFilialInfo = () => {
+    if (!filialSelecionada) return null
+
     return (
       <div className="flex flex-col gap-12 w-full px-4">
-        <div className="flex gap-12 text-xs">
+        <div className="flex flex-wrap gap-6 text-xs">
           <div>
             <span className="text-zinc-500">Nome</span>
-            <p>{cliente.nomeEmpresa}</p>
+            <p>{filialSelecionada.nomeEmpresa}</p>
           </div>
           <div>
-            <span className="text-zinc-500">CNPJ</span>
-            <p>{cliente.cnpjCpf}</p>
+            <span className="text-zinc-500">CNPJ/CPF</span>
+            <p>{filialSelecionada.cnpjCpf}</p>
           </div>
           <div>
             <span className="text-zinc-500">Inscrição Estadual</span>
-            <p>{cliente.ie}</p>
+            <p>{filialSelecionada.ie}</p>
           </div>
           <div>
             <span className="text-zinc-500">Categoria</span>
-            <p>{cliente.categoria}</p>
+            <p>{filialSelecionada.categoria}</p>
           </div>
           <div>
             <span className="text-zinc-500">E-mail</span>
-            <p>{cliente.email}</p>
+            <p>{filialSelecionada.email}</p>
           </div>
           <div>
             <span className="text-zinc-500">Telefone</span>
-            <p>{cliente.telefone}</p>
+            <p>{filialSelecionada.telefone}</p>
           </div>
         </div>
-        <div className="flex gap-12 text-xs">
+        <div className="flex flex-wrap gap-6 text-xs">
           <div>
             <span className="text-zinc-500">Endereço</span>
-            <p>{cliente.endereco}</p>
+            <p>{filialSelecionada.endereco}</p>
           </div>
           <div>
             <span className="text-zinc-500">Número</span>
-            <p>{cliente.numeroEndereco}</p>
+            <p>{filialSelecionada.numeroEndereco}</p>
           </div>
           <div>
             <span className="text-zinc-500">Cidade</span>
-            <p>{cliente.cidade}</p>
+            <p>{filialSelecionada.cidade}</p>
           </div>
           <div>
             <span className="text-zinc-500">Estado</span>
-            <p>{cliente.estado}</p>
+            <p>{filialSelecionada.estado}</p>
           </div>
           <div>
             <span className="text-zinc-500">CEP</span>
-            <p>{cliente.cep}</p>
+            <p>{filialSelecionada.cep}</p>
           </div>
         </div>
       </div>
@@ -87,22 +100,21 @@ export function DadosCliente({ onSelectCliente }: Props) {
   return (
     <div className="flex flex-col gap-4 p-4 rounded-xl bg-sidebar text-sidebar-foreground">
       <span>Dados do cliente</span>
-      <div className="flex justify-between gap-4">
-        <div className="flex flex-col gap-2 w-[400px]">
-          <label className="px-1 text-xs">Escolha um cliente</label>
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Dropdown de Cliente */}
+        <div className="flex flex-col gap-2 w-[300px]">
+          <label className="text-xs">Escolha um cliente</label>
           <DropdownMenu>
             <DropdownMenuTrigger className="flex justify-between items-center p-2 border rounded-md w-full">
-              {selectedNome || 'Escolha um cliente'} <ChevronDown size={16} />
+              {clienteSelecionado?.nomeEmpresa || 'Selecionar cliente'}{' '}
+              <ChevronDown size={16} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="p-2 border rounded-md bg-sidebar"
-            >
+            <DropdownMenuContent className="p-2 border rounded-md bg-sidebar">
               {clientes.map((cliente) => (
                 <DropdownMenuItem
                   key={cliente._id}
                   className="p-2 rounded-md"
-                  onClick={() => handleClienteChange(cliente.nomeEmpresa)}
+                  onClick={() => handleClienteChange(cliente)}
                 >
                   {cliente.nomeEmpresa}
                 </DropdownMenuItem>
@@ -110,8 +122,35 @@ export function DadosCliente({ onSelectCliente }: Props) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {selectedNome && renderClienteInfo()}
+
+        {/* Dropdown de Filial */}
+        {clienteSelecionado && (
+          <div className="flex flex-col gap-2 w-[300px]">
+            <label className="text-xs">Escolha um CNPJ da filial</label>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex justify-between items-center p-2 border rounded-md w-full">
+                {filialSelecionada?.cnpjCpf || 'Selecionar CNPJ'}{' '}
+                <ChevronDown size={16} />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="p-2 border rounded-md bg-sidebar">
+                {filiais.map((filial) => (
+                  <DropdownMenuItem
+                    key={filial._id}
+                    className="p-2 rounded-md"
+                    onClick={() => handleFilialChange(filial)}
+                  >
+                    {filial.cnpjCpf}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
+
+      {/* Exibir dados da filial selecionada */}
+      {filialSelecionada && renderFilialInfo()}
     </div>
   )
 }

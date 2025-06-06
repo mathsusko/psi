@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table'
 import { MoveLeft, Plus, Delete } from 'lucide-react'
 import { DadosPrestador } from './DadosPrestador'
-import { DadosCliente } from './DadosCliente'
+import { DadosClienteFilial } from './DadosCliente'
 import { DialogAddMateriais } from './componentes/modal-gerar-orcamento-materias'
 
 import { useMateriaisList } from '@/hooks/useMateriaisList'
@@ -26,33 +26,18 @@ import { Separator } from '@/components/ui/separator'
 export function GerarOrcamentoMateriais() {
   const navigate = useNavigate()
 
-  // Estados para IDs dinâmicos
-  const [clienteId, setClienteId] = useState('')
+  const [filialId, setFilialId] = useState('')
   const [prestadorId, setPrestadorId] = useState('')
-
-  // BRL formatter state
   const [custoBRL, setCustoBRL] = useState('R$ 0,00')
   const [custoNum, setCustoNum] = useState(0)
-
-  // datas de início e saída
   const [dataInicio, setDataInicio] = useState('')
   const [dataSaida, setDataSaida] = useState('')
-
-  // lista de itens
   const { itens, addItem, removeItem } = useMateriaisList()
-
   const [isSaving, setIsSaving] = useState(false)
 
-  // atualiza custo em BRL e número
   const handleCustoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const onlyDigits = e.target.value.replace(/\D/g, '')
-    if (!onlyDigits) {
-      setCustoBRL('R$ 0,00')
-      setCustoNum(0)
-      return
-    }
-    const cents = parseInt(onlyDigits, 10)
-    const value = cents / 100
+    const value = parseInt(onlyDigits || '0', 10) / 100
     setCustoNum(value)
     setCustoBRL(
       new Intl.NumberFormat('pt-BR', {
@@ -62,10 +47,8 @@ export function GerarOrcamentoMateriais() {
     )
   }
 
-  // cria orçamento e itens, depois redireciona
   const handleConcluir = async () => {
-    if (!dataInicio || !dataSaida || itens.length === 0 || !clienteId || !prestadorId) {
-      // aqui pode exibir um toast
+    if (!dataInicio || !dataSaida || itens.length === 0 || !filialId || !prestadorId) {
       console.warn('Preencha todos os campos obrigatórios.')
       return
     }
@@ -74,11 +57,12 @@ export function GerarOrcamentoMateriais() {
     try {
       const orcDto: OrcamentoDTO = {
         prestadorId,
-        clienteId,
+        filialId, // ✅ campo correto
         custo: custoNum,
         dataInicio: new Date(dataInicio).toISOString(),
         dataSaida: new Date(dataSaida).toISOString()
       }
+
       const orc = await createOrcamento(orcDto)
 
       await Promise.all(
@@ -109,7 +93,6 @@ export function GerarOrcamentoMateriais() {
     <>
       <Helmet title="Gerar Orçamento Materiais" />
 
-      {/* cabeçalho */}
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <Link
           to="/orcamentos-de-materiais"
@@ -120,17 +103,15 @@ export function GerarOrcamentoMateriais() {
         <h1 className="text-sm font-bold">Criar Orçamento Materiais</h1>
       </div>
 
-      {/* dados prestador / cliente */}
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <DadosPrestador onSelectPrestador={(id) => setPrestadorId(id)} />
         <Separator
           className="mt-[32px]"
           orientation="horizontal"
         />
-        <DadosCliente onSelectCliente={(id) => setClienteId(id)} />
+        <DadosClienteFilial onSelectFilial={(id) => setFilialId(id)} />
       </div>
 
-      {/* cabeçalho do orçamento (custo + datas) */}
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground flex gap-4">
         <div className="flex flex-col w-full">
           <label
@@ -176,7 +157,6 @@ export function GerarOrcamentoMateriais() {
         </div>
       </div>
 
-      {/* tabela de itens */}
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <span>Lista de Produtos</span>
         <Table className="mt-2">
@@ -207,9 +187,7 @@ export function GerarOrcamentoMateriais() {
                   <TableCell>{item.medida}</TableCell>
                   <TableCell>{item.quantidade}</TableCell>
                   <TableCell>R$ {item.precoUn.toFixed(2).replace('.', ',')}</TableCell>
-                  <TableCell>
-                    R$ {(item.quantidade * item.precoUn).toFixed(2).replace('.', ',')}
-                  </TableCell>
+                  <TableCell>R$ {total.toFixed(2).replace('.', ',')}</TableCell>
                   <TableCell className="text-center">
                     <Button
                       variant="outline"
@@ -238,7 +216,6 @@ export function GerarOrcamentoMateriais() {
         </Dialog>
       </div>
 
-      {/* concluir */}
       <div className="flex justify-end p-4">
         <Button
           onClick={handleConcluir}
@@ -247,7 +224,7 @@ export function GerarOrcamentoMateriais() {
             itens.length === 0 ||
             !dataInicio ||
             !dataSaida ||
-            !clienteId ||
+            !filialId ||
             !prestadorId
           }
         >
@@ -257,4 +234,3 @@ export function GerarOrcamentoMateriais() {
     </>
   )
 }
-  

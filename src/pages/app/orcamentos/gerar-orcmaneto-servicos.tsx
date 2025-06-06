@@ -10,13 +10,13 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 
 import { DadosPrestador } from './DadosPrestador'
-import { DadosCliente } from './DadosCliente'
+import { DadosClienteFilial } from './DadosCliente'
 import { createOrcamento, OrcamentoDTO } from '@/api/Orcamento'
 
 export function GerarOrcamentoServicos() {
   const navigate = useNavigate()
 
-  const [clienteId, setClienteId] = useState('')
+  const [filialId, setFilialId] = useState('')
   const [prestadorId, setPrestadorId] = useState('')
   const [descricaoServico, setDescricaoServico] = useState('')
   const [custoBRL, setCustoBRL] = useState('R$ 0,00')
@@ -27,8 +27,7 @@ export function GerarOrcamentoServicos() {
 
   const handleCustoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const onlyDigits = e.target.value.replace(/\D/g, '')
-    const cents = parseInt(onlyDigits || '0', 10)
-    const value = cents / 100
+    const value = parseInt(onlyDigits || '0', 10) / 100
     setCustoNum(value)
     setCustoBRL(
       new Intl.NumberFormat('pt-BR', {
@@ -39,7 +38,7 @@ export function GerarOrcamentoServicos() {
   }
 
   const handleConcluir = async () => {
-    if (!dataInicio || !dataSaida || !clienteId || !prestadorId) {
+    if (!dataInicio || !dataSaida || !filialId || !prestadorId) {
       console.warn('Preencha todos os campos obrigatórios.')
       return
     }
@@ -48,11 +47,11 @@ export function GerarOrcamentoServicos() {
     try {
       const orcDto: OrcamentoDTO = {
         prestadorId,
-        clienteId,
+        filialId, // ✅ corrigido
         custo: custoNum,
         dataInicio: new Date(dataInicio).toISOString(),
         dataSaida: new Date(dataSaida).toISOString(),
-        descricaoServico // <- necessário no DTO
+        descricaoServico
       }
 
       const orc = await createOrcamento(orcDto)
@@ -84,7 +83,7 @@ export function GerarOrcamentoServicos() {
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <DadosPrestador onSelectPrestador={setPrestadorId} />
         <Separator className="mt-8 mb-4" />
-        <DadosCliente onSelectCliente={setClienteId} />
+        <DadosClienteFilial onSelectFilial={setFilialId} />
       </div>
 
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground flex gap-4">
@@ -151,7 +150,7 @@ export function GerarOrcamentoServicos() {
       <div className="flex justify-end p-4">
         <Button
           onClick={handleConcluir}
-          disabled={isSaving || !dataInicio || !dataSaida || !clienteId || !prestadorId}
+          disabled={isSaving || !dataInicio || !dataSaida || !filialId || !prestadorId}
         >
           {isSaving ? 'Salvando...' : 'Concluir'}
         </Button>

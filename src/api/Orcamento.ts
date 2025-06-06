@@ -3,11 +3,11 @@ import { api } from '@/lib/axios'
 // DTO para criação de orçamento
 export interface OrcamentoDTO {
   prestadorId: string
-  clienteId: string
+  filialId: string // ✅ substituído clienteId por filialId
   custo?: number
   dataInicio?: string
   dataSaida?: string
-  descricaoServico?: string // ✅ Corrigido: adicionado ao DTO
+  descricaoServico?: string
 }
 
 // Tipo retornado com campos completos (inclusive populate)
@@ -20,7 +20,7 @@ export interface OrcamentoResponse {
     email: string
     [key: string]: any
   }
-  clienteId: {
+  filialId: {
     _id: string
     nomeEmpresa: string
     cnpjCpf: string
@@ -30,7 +30,7 @@ export interface OrcamentoResponse {
   custo: number
   dataInicio: string
   dataSaida: string
-  descricaoServico?: string // ✅ Corrigido: incluído na resposta também
+  descricaoServico?: string
   createdAt: string
   updatedAt: string
   __v?: number
@@ -57,7 +57,7 @@ export async function getOrcamento(id: string): Promise<OrcamentoResponse> {
 // Lista orçamentos com filtros opcionais
 export async function listOrcamentos(filtros?: {
   prestadorId?: string
-  clienteId?: string
+  filialId?: string // ✅ atualizado também aqui
 }): Promise<OrcamentoResponse[]> {
   const res = await api.get<OrcamentoResponse[]>('/orcamentos', { params: filtros })
   return res.data

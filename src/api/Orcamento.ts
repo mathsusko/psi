@@ -54,6 +54,12 @@ export async function getOrcamento(id: string): Promise<OrcamentoResponse> {
   return res.data
 }
 
+// Deletar orcamento
+export async function deleteOrcamento(id: string) {
+  const response = await api.delete(`/orcamentos/${id}`)
+  return response.data
+}
+
 // Lista orçamentos com filtros opcionais
 export async function listOrcamentos(filtros?: {
   prestadorId?: string

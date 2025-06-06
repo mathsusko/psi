@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import ClientesService from '@/api/clientes'
+import ClientesService, { Cliente } from '@/api/clientes'
 import { getFiliais } from '@/api/filiais'
 import {
   DropdownMenu,
@@ -13,29 +13,45 @@ interface Props {
   onSelectFilial: (filialId: string) => void
 }
 
-export function DadosClienteFilial({ onSelectFilial }: Props) {
-  const [clientes, setClientes] = useState<any[]>([])
-  const [filiais, setFiliais] = useState<any[]>([])
+interface Filial {
+  _id: string
+  nomeEmpresa: string
+  cnpjCpf: string
+  ie?: string
+  categoria?: string
+  email?: string
+  telefone?: string
+  endereco?: string
+  numeroEndereco?: string
+  cidade?: string
+  estado?: string
+  cep?: string
+}
 
-  const [clienteSelecionado, setClienteSelecionado] = useState<any | null>(null)
-  const [filialSelecionada, setFilialSelecionada] = useState<any | null>(null)
+export function DadosClienteFilial({ onSelectFilial }: Props) {
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [filiais, setFiliais] = useState<Filial[]>([])
+
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null)
+  const [filialSelecionada, setFilialSelecionada] = useState<Filial | null>(null)
 
   useEffect(() => {
     ClientesService.listar().then(setClientes).catch(console.error)
   }, [])
 
-  const handleClienteChange = async (cliente: any) => {
+  const handleClienteChange = async (cliente: Cliente) => {
     setClienteSelecionado(cliente)
     setFilialSelecionada(null)
     try {
-      const lista = await getFiliais(cliente._id)
-      setFiliais(lista.data)
+      const lista = await getFiliais(cliente._id || '')
+      setFiliais(Array.isArray(lista) ? lista : []) // fallback seguro
     } catch (err) {
       console.error('Erro ao carregar filiais:', err)
+      setFiliais([])
     }
   }
 
-  const handleFilialChange = (filial: any) => {
+  const handleFilialChange = (filial: Filial) => {
     setFilialSelecionada(filial)
     onSelectFilial(filial._id)
   }
@@ -100,6 +116,7 @@ export function DadosClienteFilial({ onSelectFilial }: Props) {
   return (
     <div className="flex flex-col gap-4 p-4 rounded-xl bg-sidebar text-sidebar-foreground">
       <span>Dados do cliente</span>
+
       <div className="flex flex-col md:flex-row gap-6">
         {/* Dropdown de Cliente */}
         <div className="flex flex-col gap-2 w-[300px]">
@@ -134,15 +151,16 @@ export function DadosClienteFilial({ onSelectFilial }: Props) {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="p-2 border rounded-md bg-sidebar">
-                {filiais.map((filial) => (
-                  <DropdownMenuItem
-                    key={filial._id}
-                    className="p-2 rounded-md"
-                    onClick={() => handleFilialChange(filial)}
-                  >
-                    {filial.cnpjCpf}
-                  </DropdownMenuItem>
-                ))}
+                {Array.isArray(filiais) &&
+                  filiais.map((filial) => (
+                    <DropdownMenuItem
+                      key={filial._id}
+                      className="p-2 rounded-md"
+                      onClick={() => handleFilialChange(filial)}
+                    >
+                      {filial.cnpjCpf}
+                    </DropdownMenuItem>
+                  ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

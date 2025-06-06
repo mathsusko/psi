@@ -15,17 +15,29 @@ import {
 import { Download } from 'lucide-react'
 
 export default function Orcamento() {
-  const { id: clienteId } = useParams()
+  const { id: filialId } = useParams()
   const [orcamentos, setOrcamentos] = useState<any[]>([])
 
   useEffect(() => {
     async function fetch() {
-      const data = await getAllOrcamentos({ clienteId })
-      setOrcamentos(data)
+      try {
+        const data = await getAllOrcamentos({ filialId })
+        setOrcamentos(data)
+      } catch (err) {
+        console.error('Erro ao buscar orçamentos da filial:', err)
+      }
     }
 
     fetch()
-  }, [clienteId])
+  }, [filialId])
+
+  const formatDate = (dateStr: string) => {
+    return new Intl.DateTimeFormat('pt-BR').format(new Date(dateStr))
+  }
+
+  const formatCurrency = (value: number) => {
+    return `R$ ${value.toFixed(2).replace('.', ',')}`
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -42,8 +54,8 @@ export default function Orcamento() {
         <TableBody>
           {orcamentos.map((orcamento) => {
             const tipo = orcamento.descricaoServico ? 'Serviço' : 'Material'
-            const data = new Date(orcamento.createdAt).toLocaleDateString('pt-BR')
-            const custo = `R$ ${orcamento.custo?.toFixed(2).replace('.', ',')}`
+            const data = formatDate(orcamento.createdAt)
+            const custo = formatCurrency(orcamento.custo ?? 0)
 
             return (
               <TableRow key={orcamento._id}>
@@ -68,6 +80,7 @@ export default function Orcamento() {
                         <Download
                           size={16}
                           className="cursor-pointer hover:text-primary"
+                          title="Baixar PDF"
                         />
                       )
                     }

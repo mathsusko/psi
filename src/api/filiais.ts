@@ -1,8 +1,9 @@
 import { api } from '@/lib/axios'
+import { Cliente } from './clientes'
 
-export async function getFiliais(clientePaiId: string) {
-  const response = await api.get(`/filiais/${clientePaiId}`)
-  return response.data
+export async function getFiliais(clientePaiId: string): Promise<Cliente[]> {
+  const response = await api.get(`/clientes/filiais/${clientePaiId}`)
+  return Array.isArray(response.data) ? response.data : []
 }
 
 export async function getFilialPorId(id: string) {

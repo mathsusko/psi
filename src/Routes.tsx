@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import { AppLayout } from './pages/_layouts/app'
 import { AuthLayout } from './pages/_layouts/auth'
@@ -6,6 +6,8 @@ import { AuthLayout } from './pages/_layouts/auth'
 import { SignIn } from './pages/auth/sign-in'
 import { Dashboard } from './pages/app/dashboard/dashboard'
 import { NotFound } from './pages/app/404'
+
+import { RequireAuth } from './components/RequireAuth'
 
 // Estoque
 import EstoquePage from './pages/app/estoque/estoque'
@@ -50,33 +52,48 @@ import FuncionarioHoras from './pages/app/funcionarios/[id]/horas'
 import FuncionarioPagamentos from './pages/app/funcionarios/[id]/pagamentos'
 
 export const router = createBrowserRouter([
-  // ROTAS PROTEGIDAS
   {
     path: '/',
-    element: <AppLayout />,
+    element: <AuthLayout />,
+    children: [
+      {
+        path: '/',
+        element: (
+          <Navigate
+            to="/sign-in"
+            replace
+          />
+        )
+      },
+      { path: 'sign-in', element: <SignIn /> }
+    ]
+  },
+  {
+    path: '/',
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     errorElement: <NotFound />,
     children: [
-      { path: '/', element: <Dashboard /> },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'estoque', element: <EstoquePage /> },
+      { path: 'estoque/:id', element: <ItensDoCardPage /> },
+      { path: 'add-peca-por-kilo', element: <AddPecaPorKilo /> },
+      { path: 'add-peca-por-metro', element: <AddPecaPorMetro /> },
+      { path: 'add-peca-por-qtd', element: <AddPecaPorQtd /> },
+      { path: 'edit-peca-por-qtd', element: <EditPecaPorQtd /> },
 
-      // ESTOQUE
-      { path: '/estoque', element: <EstoquePage /> },
-      { path: '/app/estoque/:id', element: <ItensDoCardPage /> },
-      { path: '/add-peca-por-kilo', element: <AddPecaPorKilo /> },
-      { path: '/add-peca-por-metro', element: <AddPecaPorMetro /> },
-      { path: '/add-peca-por-qtd', element: <AddPecaPorQtd /> },
-      { path: '/edit-peca-por-qtd', element: <EditPecaPorQtd /> },
-
-      // CLIENTES
-      { path: '/clientes', element: <Clientes /> },
+      { path: 'clientes', element: <Clientes /> },
       {
-        path: '/clientes/:id',
+        path: 'clientes/:id',
         element: <Cliente />,
         children: [{ path: 'filiais', element: <FiliaisDoCliente /> }]
       },
 
-      // FILIAL DO CLIENTE
       {
-        path: '/clientes/filial/:filialId',
+        path: 'clientes/filial/:filialId',
         element: <FilialProfile />,
         children: [
           { path: 'orcamento', element: <FilialOrcamento /> },
@@ -85,11 +102,10 @@ export const router = createBrowserRouter([
         ]
       },
 
-      // FUNCIONÁRIOS
-      { path: '/funcionarios', element: <FuncionariosList /> },
-      { path: '/funcionarios/novo', element: <NovoFuncionarioPage /> },
+      { path: 'funcionarios', element: <FuncionariosList /> },
+      { path: 'funcionarios/novo', element: <NovoFuncionarioPage /> },
       {
-        path: '/funcionarios/:id',
+        path: 'funcionarios/:id',
         element: <FuncionarioProfileLayout />,
         children: [
           { path: 'dados', element: <FuncionarioDados /> },
@@ -98,37 +114,32 @@ export const router = createBrowserRouter([
         ]
       },
 
-      // ORÇAMENTOS
-      { path: '/orcamentos-de-materiais', element: <OrcamentoDeMateriaisLista /> },
-      { path: '/orcamentos-de-servicos', element: <OrcamentoDeServicosLista /> },
-      { path: '/gerar-orcamento-materiais', element: <GerarOrcamentoMateriais /> },
-      { path: '/gerar-orcamento-servicos', element: <GerarOrcamentoServicos /> },
+      { path: 'orcamentos-de-materiais', element: <OrcamentoDeMateriaisLista /> },
+      { path: 'orcamentos-de-servicos', element: <OrcamentoDeServicosLista /> },
+      { path: 'gerar-orcamento-materiais', element: <GerarOrcamentoMateriais /> },
+      { path: 'gerar-orcamento-servicos', element: <GerarOrcamentoServicos /> },
       {
-        path: '/previsualizacao-orcamento-materiais/:id',
+        path: 'previsualizacao-orcamento-materiais/:id',
         element: <PrevisualizacaoOrcamentoDeMateriais />
       },
       {
-        path: '/previsualizacao-orcamento-servicos/:id',
+        path: 'previsualizacao-orcamento-servicos/:id',
         element: <PrevisualizacaoOrcamentoDeServicos />
       },
       {
-        path: '/previsualizacao-orcamento-servicos',
+        path: 'previsualizacao-orcamento-servicos',
         element: <PrevisualizacaoOrcamentoDeServicos />
       },
 
-      // NOTAS FISCAIS
-      { path: '/notas-fiscais-lista', element: <NotasFiscaisLista /> },
-      { path: '/gerar-nota-fiscal-one', element: <GerarNotaFiscalOne /> },
-      { path: '/gerar-nota-fiscal-two', element: <GerarNotaFiscalTwo /> },
-      { path: '/gerar-nota-fiscal-three', element: <GerarNotaFiscalThree /> },
-      { path: '/preview-nota-fiscal', element: <PreviewNotaFiscal /> }
+      { path: 'notas-fiscais-lista', element: <NotasFiscaisLista /> },
+      { path: 'gerar-nota-fiscal-one', element: <GerarNotaFiscalOne /> },
+      { path: 'gerar-nota-fiscal-two', element: <GerarNotaFiscalTwo /> },
+      { path: 'gerar-nota-fiscal-three', element: <GerarNotaFiscalThree /> },
+      { path: 'preview-nota-fiscal', element: <PreviewNotaFiscal /> }
     ]
   },
-
-  // ROTAS PÚBLICAS (Auth)
   {
-    path: '/',
-    element: <AuthLayout />,
-    children: [{ path: '/sign-in', element: <SignIn /> }]
+    path: '*',
+    element: <NotFound />
   }
 ])

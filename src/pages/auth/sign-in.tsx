@@ -1,21 +1,19 @@
-// src/pages/auth/sign-in.tsx
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@radix-ui/react-label'
-import { useMutation } from '@tanstack/react-query'
+import { Label } from '@/components/ui/label'
 import { useNavigate } from 'react-router-dom'
-import { signIn } from '@/api/sign-in'
 
-const signInForm = z.object({
-  email: z.string().email(),
-  senha: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres')
+const signInSchema = z.object({
+  email: z.string().email({ message: 'E-mail inválido' }),
+  senha: z.string().min(1, 'Informe sua senha')
 })
 
-type SignInForm = z.infer<typeof signInForm>
+type SignInForm = z.infer<typeof signInSchema>
 
 export function SignIn() {
   const navigate = useNavigate()
@@ -23,27 +21,25 @@ export function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting }
-  } = useForm<SignInForm>()
-
-  const { mutateAsync: authenticate } = useMutation({
-    mutationFn: signIn
+    formState: { errors, isSubmitting }
+  } = useForm<SignInForm>({
+    resolver: zodResolver(signInSchema)
   })
 
   async function handleSignIn(data: SignInForm) {
-    try {
-      await authenticate({ email: data.email, senha: data.senha })
-      toast.success('Login bem-sucedido. Redirecionando...')
-      navigate('/', { replace: true })
-    } catch {
+    if (data.email === 'admin@psi.com.br' && data.senha === '123456') {
+      localStorage.setItem('logado', 'true')
+      toast.success('Login bem-sucedido! Redirecionando...')
+      navigate('/dashboard')
+    } else {
       toast.error('Credenciais inválidas.')
     }
   }
 
   return (
     <>
-      <Helmet title="login" />
-      <div className="p-8">
+      <Helmet title="Login" />
+      <div className="p-8 flex justify-center items-center min-h-screen">
         <div className="w-[350px] flex flex-col justify-center gap-6">
           <div className="flex flex-col gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">Acessar Painel</h1>
@@ -61,8 +57,12 @@ export function SignIn() {
               <Input
                 id="email"
                 type="email"
+                placeholder="email@exemplo.com"
                 {...register('email')}
               />
+              {errors.email && (
+                <span className="text-red-500 text-sm">{errors.email.message}</span>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -70,16 +70,20 @@ export function SignIn() {
               <Input
                 id="senha"
                 type="password"
+                placeholder="••••••••"
                 {...register('senha')}
               />
+              {errors.senha && (
+                <span className="text-red-500 text-sm">{errors.senha.message}</span>
+              )}
             </div>
 
             <Button
+              type="submit"
               disabled={isSubmitting}
               className="w-full"
-              type="submit"
             >
-              Acessar painel
+              {isSubmitting ? 'Entrando...' : 'Acessar painel'}
             </Button>
           </form>
         </div>

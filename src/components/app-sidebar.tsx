@@ -28,8 +28,8 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: 'Gustavo',
-    email: 'contato@psi.com',
+    name: 'admin',
+    email: 'admin@psi.com',
     avatar: logo
   },
   teams: [
@@ -52,7 +52,7 @@ const data = {
   navMain: [
     {
       title: 'Estatísticas',
-      url: '/',
+      url: '/dashboard',
       icon: SquareTerminal,
       isActive: true
     },
@@ -76,21 +76,21 @@ const data = {
         }
       ]
     },
-    {
-      title: 'Nota fiscal',
-      url: '/notas-fiscais-lista',
-      icon: FileCheck
-    },
+    // {
+    //   title: 'Nota fiscal',
+    //   url: '/notas-fiscais-lista',
+    //   icon: FileCheck
+    // },
     {
       title: 'Clientes',
       url: '/clientes',
       icon: UsersRound
-    },
-    {
-      title: 'Controle de Funcionário',
-      url: '/funcionarios',
-      icon: Settings2
     }
+    // {
+    //   title: 'Controle de Funcionário',
+    //   url: '/funcionarios',
+    //   icon: Settings2
+    // }
   ]
 }
 

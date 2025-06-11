@@ -8,6 +8,7 @@ import { router } from './Routes'
 import { ThemeProvider } from './components/theme/theme-provider'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './lib/react-query'
+import { AuthProvider } from './hooks/useAuth' // <-- Adicionado
 
 export function App() {
   return (
@@ -20,7 +21,11 @@ export function App() {
         <Toaster richColors />
 
         <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            {' '}
+            {/* <-- Envolvendo com AuthProvider */}
+            <RouterProvider router={router} />
+          </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </HelmetProvider>

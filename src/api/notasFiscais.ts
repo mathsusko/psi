@@ -1,11 +1,11 @@
 import { api } from '@/lib/axios'
 
 export interface NotaFiscal {
-  _id?: string
+  _id: string
   clienteNome: string
   descricao: string
   dataRecebimento: string
-  fileUrl: string
+  caminhoArquivo: string
 }
 
 export const NotaFiscalService = {

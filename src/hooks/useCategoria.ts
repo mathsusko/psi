@@ -48,7 +48,9 @@ export function useCategoria() {
   const fetchMedidas = async (cardId: string) => {
     setLoadingMedidas(true)
     try {
-      const response = await axios.get(`http://localhost:3333/api/cards/${cardId}/itens`)
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/cards/${cardId}/itens`
+      )
       const medidas = response.data.map((item: { medida: string }) => item.medida)
       setMedidas(medidas)
     } catch (error) {

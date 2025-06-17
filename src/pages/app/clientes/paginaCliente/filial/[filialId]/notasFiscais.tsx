@@ -16,19 +16,18 @@ import { Trash } from 'lucide-react'
 
 export default function NotasFiscaisRecebidas() {
   const [open, setOpen] = useState(false)
-  const [notaExcluindo, setNotaExcluindo] = useState<string | null>(null)
   const { data = [], isLoading } = useNotasFiscais()
   const { mutateAsync: deletarNota } = useDeletarNotaFiscal()
 
+  // Aqui, você pode passar o ID da filial dinamicamente de acordo com a URL
+  const filialId = '684071eb0aa7be1361218378' // Exemplo do ID da filial (isso pode vir da URL ou outra lógica)
+
   const handleDeletar = async (id: string) => {
     try {
-      setNotaExcluindo(id)
       await deletarNota(id)
       toast.success('Nota fiscal removida.')
     } catch (error) {
       toast.error('Erro ao remover nota fiscal.')
-    } finally {
-      setNotaExcluindo(null)
     }
   }
 
@@ -56,19 +55,18 @@ export default function NotasFiscaisRecebidas() {
             <TableBody>
               {data.map((nota) => (
                 <TableRow key={nota._id}>
-                  <TableCell>{nota.nomeEmpresa}</TableCell>
+                  <TableCell>{nota.clienteNome}</TableCell>
                   <TableCell>{nota.descricao}</TableCell>
                   <TableCell>
                     {format(new Date(nota.dataRecebimento), 'dd/MM/yyyy')}
                   </TableCell>
                   <TableCell>
                     <a
-                      href={`/uploads/${nota.caminhoArquivo}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/uploads/${nota.caminhoArquivo}`} // Certifique-se de que o arquivo está acessível via URL no servidor
+                      download={nota.caminhoArquivo} // Força o download do arquivo
                       className="text-blue-600 underline text-sm"
                     >
-                      Ver PDF
+                      Baixar PDF
                     </a>
                   </TableCell>
                   <TableCell>
@@ -77,7 +75,6 @@ export default function NotasFiscaisRecebidas() {
                       size="icon"
                       title="Excluir nota fiscal"
                       onClick={() => handleDeletar(nota._id)}
-                      disabled={notaExcluindo === nota._id}
                     >
                       <Trash className="w-4 h-4 text-red-600" />
                     </Button>
@@ -92,6 +89,7 @@ export default function NotasFiscaisRecebidas() {
       <ModalAdicionarNotaFiscal
         open={open}
         onOpenChange={setOpen}
+        filialId={filialId} // Passando o ID da filial para o modal
       />
     </div>
   )

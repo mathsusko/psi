@@ -37,7 +37,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
   const [state, setState] = useState({
     id: materialData.id || '',
     nome: materialData.nome || '',
-    imagem: materialData.imagem || '',
+    imagem: materialData.imagem || '', // Imagem inicial
     medida: materialData.medida || '',
     quantidade: materialData.quantidade || '',
     precoUn: materialData.precoUn || ''
@@ -71,7 +71,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
             </label>
             {state.imagem ? (
               <img
-                src={`http://localhost:3333${state.imagem}`}
+                src={`${import.meta.env.VITE_API_URL}${state.imagem}`} // Construção da URL
                 alt={state.nome || 'Imagem do material'}
                 className="w-[227px] h-[227px] object-contain border rounded-sm"
               />
@@ -104,7 +104,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
                           ...prev,
                           id: card._id,
                           nome: card.nome,
-                          imagem: card.imagemUrl || '' // corrigido para garantir string
+                          imagem: card.imagemUrl || '' // Corrigido para garantir que a URL da imagem seja corretamente atualizada
                         }))
                         fetchMedidas(card._id)
                       }}
@@ -211,7 +211,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
               onAdd({
                 id: state.id,
                 nome: state.nome,
-                imagem: state.imagem || '', // força tipo string
+                imagem: state.imagem || '', // Forçando tipo string
                 medida: state.medida,
                 quantidade: Number(state.quantidade),
                 precoUn: parseBr(state.precoUn)

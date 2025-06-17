@@ -64,7 +64,7 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
 
       setNomeEditado(response.data.nome)
       setCategoriaEditada(response.data.categoria)
-      setImagemEditada(`http://localhost:3333${response.data.imagemUrl}`)
+      setImagemEditada(`${import.meta.env.VITE_API_URL}${response.data.imagemUrl}`)
     } catch (error) {
       console.error('Erro ao editar card:', error)
     }
@@ -85,7 +85,7 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
   const handleCancelDelete = () => setIsConfirmDeleteOpen(false)
   const handleEdit = () => setIsModalOpen(true)
   const handleDelete = () => setIsConfirmDeleteOpen(true)
-  const handleVerMais = () => navigate(`/app/estoque/${id}`)
+  const handleVerMais = () => navigate(`/estoque/${id}`)
 
   return (
     <div className="flex flex-col gap-2 rounded-lg shadow-md transition-transform duration-200 bg-sidebar hover:shadow-lg dark:bg-sidebar-800 foreground p-4">

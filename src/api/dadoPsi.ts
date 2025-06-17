@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:3333/api/dadoPsi'
+const API_URL = `${import.meta.env.VITE_API_URL}/dadoPsi`
 
 // Função para listar dadosPsi
 const listarDadoPsi = async () => axios.get(API_URL).then((res) => res.data)

@@ -10,9 +10,10 @@ import { toast } from 'sonner'
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
+  filialId: string
 }
 
-export function ModalAdicionarNotaFiscal({ open, onOpenChange }: Props) {
+export function ModalAdicionarNotaFiscal({ open, onOpenChange, filialId }: Props) {
   const [clienteNome, setClienteNome] = useState('')
   const [descricao, setDescricao] = useState('')
   const [dataRecebimento, setDataRecebimento] = useState('')
@@ -30,14 +31,15 @@ export function ModalAdicionarNotaFiscal({ open, onOpenChange }: Props) {
     formData.append('clienteNome', clienteNome)
     formData.append('descricao', descricao)
     formData.append('dataRecebimento', dataRecebimento)
-    formData.append('arquivo', arquivo) // <-- nome corrigido aqui
+    formData.append('arquivo', arquivo)
+    formData.append('filialId', filialId) // Enviando o ID da filial
 
     try {
       await mutateAsync(formData)
       toast.success('Nota fiscal adicionada com sucesso.')
       onOpenChange(false)
 
-      // reset
+      // Resetando os campos
       setClienteNome('')
       setDescricao('')
       setDataRecebimento('')

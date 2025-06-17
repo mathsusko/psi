@@ -9,6 +9,10 @@ export default function Estoque() {
   const { cards, isLoading, isError } = useCardsEstoque()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // Configuração da URL base da API
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3333'
+
+  // Condição para exibir mensagens de carregamento ou erro
   if (isLoading) return <p>Carregando...</p>
   if (isError) return <p>Erro ao carregar cards</p>
 
@@ -22,7 +26,8 @@ export default function Estoque() {
             key={card._id}
             id={card._id}
             nome={card.nome}
-            imagemUrl={`http://localhost:3333${card.imagemUrl}`}
+            // Construção dinâmica da URL da imagem
+            imagemUrl={`${apiUrl}${card.imagemUrl}`}
             categoria={card.categoria}
           />
         ))}

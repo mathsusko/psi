@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:3333/api/cards'
+const API_URL = `${import.meta.env.VITE_API_URL}/cards`
 
 interface CardData {
   nome: string
@@ -29,14 +29,12 @@ const editarCard = async (
   cardData: { nome: string; imagem?: File; imagemUrl?: string }
 ) => {
   const formData = new FormData()
-
-  // Adiciona os campos nome e imagem (categoria não será mais passada)
   formData.append('nome', cardData.nome)
 
   if (cardData.imagem) {
     formData.append('imagem', cardData.imagem)
   } else if (cardData.imagemUrl) {
-    formData.append('imagem', cardData.imagemUrl) // Se não houver nova imagem, mantém a imagemUrl
+    formData.append('imagem', cardData.imagemUrl)
   }
 
   return axios

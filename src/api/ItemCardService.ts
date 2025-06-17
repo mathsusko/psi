@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:3333/api/cards'
+const API_URL = `${import.meta.env.VITE_API_URL}/cards`
 
 // Tipagem para os dados de um item
 export interface ItemData {
@@ -29,7 +29,7 @@ const criarItem = async (cardId: string, itemData: ItemData) => {
 const atualizarQuantidade = async (itemId: string, quantidade: number) => {
   if (!itemId) throw new Error('Item ID is required')
   return axios
-    .patch(`http://localhost:3333/api/itens/${itemId}`, { quantidade })
+    .patch(`${import.meta.env.VITE_API_URL}/itens/${itemId}`, { quantidade })
     .then((res) => res.data)
 }
 

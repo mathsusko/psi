@@ -11,7 +11,7 @@ import { RequireAuth } from './components/RequireAuth'
 
 // Estoque
 import EstoquePage from './pages/app/estoque/estoque'
-import ItensDoCardPage from './pages/app/estoque/[id]'
+import ItensDoCardPage from './pages/app/estoque/itens-do-card'
 import { AddPecaPorKilo } from './pages/app/estoque/add-peca-por-kilo'
 import { AddPecaPorMetro } from './pages/app/estoque/add-peca-por-metragem'
 import { AddPecaPorQtd } from './pages/app/estoque/add-peca-por-qtd'
@@ -34,22 +34,25 @@ import { PreviewNotaFiscal } from './pages/app/notafiscal/preview-nota-fiscal'
 
 // Clientes
 import Clientes from './pages/app/clientes/clientes'
-import Cliente from './pages/app/clientes/paginaCliente/[id]'
-import FiliaisDoCliente from './pages/app/clientes/paginaCliente/FiliaisDoCliente'
+import ClienteDetalhe from './pages/app/clientes/paginaCliente/cliente-detalhe'
+
+import FiliaisDoCliente from './pages/app/clientes/paginaCliente/filiaisDoCliente'
 
 // Filial do Cliente
-import FilialProfile from './pages/app/clientes/paginaCliente/filial/[filialId]/index'
+import FilialProfile from './pages/app/clientes/paginaCliente/filial/[filialId]/perfil-filial'
+
 import FilialOrcamento from './pages/app/clientes/paginaCliente/filial/[filialId]/orcamento'
+
 import FilialNotasFiscais from './pages/app/clientes/paginaCliente/filial/[filialId]/notasFiscais'
 import FilialDados from './pages/app/clientes/paginaCliente/filial/[filialId]/dadosDaFilial'
 
 // Funcionários
 import FuncionariosList from './pages/app/funcionarios/index'
 import NovoFuncionarioPage from './pages/app/funcionarios/novo'
-import FuncionarioProfileLayout from './pages/app/funcionarios/[id]/index'
-import FuncionarioDados from './pages/app/funcionarios/[id]/dados'
-import FuncionarioHoras from './pages/app/funcionarios/[id]/horas'
-import FuncionarioPagamentos from './pages/app/funcionarios/[id]/pagamentos'
+import FuncionarioProfileLayout from './pages/app/funcionarios/funcionario-profile'
+import FuncionarioDados from './pages/app/funcionarios/funcionario-dados'
+import FuncionarioHoras from './pages/app/funcionarios/funcionario-horas'
+import FuncionarioPagamentos from './pages/app/funcionarios/funcionario-pagamentos'
 
 export const router = createBrowserRouter([
   {
@@ -78,6 +81,8 @@ export const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { path: 'dashboard', element: <Dashboard /> },
+
+      // Estoque
       { path: 'estoque', element: <EstoquePage /> },
       { path: 'estoque/:id', element: <ItensDoCardPage /> },
       { path: 'add-peca-por-kilo', element: <AddPecaPorKilo /> },
@@ -85,13 +90,13 @@ export const router = createBrowserRouter([
       { path: 'add-peca-por-qtd', element: <AddPecaPorQtd /> },
       { path: 'edit-peca-por-qtd', element: <EditPecaPorQtd /> },
 
+      // Clientes
       { path: 'clientes', element: <Clientes /> },
       {
         path: 'clientes/:id',
-        element: <Cliente />,
+        element: <ClienteDetalhe />,
         children: [{ path: 'filiais', element: <FiliaisDoCliente /> }]
       },
-
       {
         path: 'clientes/filial/:filialId',
         element: <FilialProfile />,
@@ -102,6 +107,7 @@ export const router = createBrowserRouter([
         ]
       },
 
+      // Funcionários
       { path: 'funcionarios', element: <FuncionariosList /> },
       { path: 'funcionarios/novo', element: <NovoFuncionarioPage /> },
       {
@@ -114,6 +120,7 @@ export const router = createBrowserRouter([
         ]
       },
 
+      // Orçamentos
       { path: 'orcamentos-de-materiais', element: <OrcamentoDeMateriaisLista /> },
       { path: 'orcamentos-de-servicos', element: <OrcamentoDeServicosLista /> },
       { path: 'gerar-orcamento-materiais', element: <GerarOrcamentoMateriais /> },
@@ -131,6 +138,7 @@ export const router = createBrowserRouter([
         element: <PrevisualizacaoOrcamentoDeServicos />
       },
 
+      // Notas Fiscais
       { path: 'notas-fiscais-lista', element: <NotasFiscaisLista /> },
       { path: 'gerar-nota-fiscal-one', element: <GerarNotaFiscalOne /> },
       { path: 'gerar-nota-fiscal-two', element: <GerarNotaFiscalTwo /> },

@@ -131,7 +131,7 @@ export function PrevisualizacaoOrcamentoDeMateriais() {
                 <TableRow key={idx}>
                   <TableCell>
                     <img
-                      src={`http://localhost:3333${item.imagem}`}
+                      src={`${import.meta.env.VITE_API_URL}${item.imagem}`}
                       alt={item.nome}
                       className="w-16 h-16 object-contain border rounded-sm"
                     />

@@ -85,12 +85,12 @@ const data = {
       title: 'Clientes',
       url: '/clientes',
       icon: UsersRound
+    },
+    {
+      title: 'Controle de Funcionário',
+      url: '/funcionarios',
+      icon: Settings2
     }
-    // {
-    //   title: 'Controle de Funcionário',
-    //   url: '/funcionarios',
-    //   icon: Settings2
-    // }
   ]
 }
 

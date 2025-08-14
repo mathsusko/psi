@@ -1,58 +1,57 @@
-// src/hooks/useFiliais.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  getFiliais,
-  getFilialPorId,
-  criarFilial,
-  atualizarFilial,
-  deletarFilial
-} from '@/api/filiais'
-import { Cliente } from '@/api/clientes'
+import { ClientesService, Filial } from '@/api/clientes'
 
+// Hook que lista as filiais de um cliente
 export function useFiliais(clientePaiId: string) {
-  return useQuery<Cliente[]>({
-    queryKey: ['filiais', clientePaiId],
-    queryFn: () => getFiliais(clientePaiId),
-    enabled: !!clientePaiId
-  })
+  return useQuery<Filial[]>(
+    ['filiais', clientePaiId],
+    async () => {
+      if (!clientePaiId) {
+        throw new Error('Cliente Pai ID é necessário para listar as filiais.')
+      }
+      try {
+        // Certifique-se de que a função de listar filiais está correta no backend
+        const filiais = await ClientesService.listarFiliais(clientePaiId)
+        return filiais // Retorne a lista de filiais
+      } catch (error) {
+        throw new Error(`Erro ao carregar filiais: ${error.message}`)
+      }
+    },
+    {
+      enabled: !!clientePaiId, // Só faz a requisição se clientePaiId estiver presente
+      refetchOnWindowFocus: false // Evitar refetch ao voltar para a página
+    }
+  )
 }
 
-export function useFilial(filialId: string) {
-  return useQuery<Cliente>({
-    queryKey: ['filial', filialId],
-    queryFn: () => getFilialPorId(filialId),
-    enabled: !!filialId
-  })
-}
-
+// Hook para criar filial
 export function useCriarFilial() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: criarFilial,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(['filiais', data.clientePaiId])
+  const qc = useQueryClient()
+  return useMutation((dados: Partial<Filial>) => ClientesService.criarFilial(dados), {
+    onSuccess: () => {
+      // Invalida a query de filiais após criar uma nova filial
+      qc.invalidateQueries(['filiais'])
+    },
+    onError: (error: any) => {
+      toast.error(`Erro ao criar filial: ${error.message}`)
     }
   })
 }
 
-export function useAtualizarFilial() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, dados }: { id: string; dados: Partial<Cliente> }) =>
-      atualizarFilial(id, dados),
-    onSuccess: (_, { dados }) => {
-      queryClient.invalidateQueries(['filiais', dados.clientePaiId])
-    }
-  })
-}
-
+// Hook para deletar filial
 export function useDeletarFilial() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ id, clientePaiId }: { id: string; clientePaiId: string }) =>
-      deletarFilial(id),
-    onSuccess: (_, { clientePaiId }) => {
-      queryClient.invalidateQueries(['filiais', clientePaiId])
+  const qc = useQueryClient()
+  return useMutation(
+    ({ id, clientePaiId }: { id: string; clientePaiId: string }) =>
+      ClientesService.deletarFilial(id, clientePaiId),
+    {
+      onSuccess: () => {
+        // Invalida a query de filiais após excluir uma filial
+        qc.invalidateQueries(['filiais'])
+      },
+      onError: (error: any) => {
+        toast.error(`Erro ao excluir filial: ${error.message}`)
+      }
     }
-  })
+  )
 }

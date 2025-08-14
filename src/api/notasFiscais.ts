@@ -6,11 +6,14 @@ export interface NotaFiscal {
   descricao: string
   dataRecebimento: string
   caminhoArquivo: string
+  filialId: string
 }
 
 export const NotaFiscalService = {
-  listar: async (): Promise<NotaFiscal[]> => {
-    const response = await api.get('/notas')
+  listar: async (filialId?: string): Promise<NotaFiscal[]> => {
+    const response = await api.get('/notas', {
+      params: { filialId }
+    })
     return response.data
   },
 

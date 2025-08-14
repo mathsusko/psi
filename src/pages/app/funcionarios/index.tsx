@@ -11,12 +11,18 @@ export default function FuncionariosList() {
     return <p className="p-6">Carregando funcionários...</p>
   }
 
+  if (funcionarios.length === 0) {
+    return <p className="p-6">Não há funcionários registrados.</p>
+  }
+
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Funcionários</h1>
         <Button asChild>
-          <Link to="/funcionarios/novo">Novo Funcionário</Link>
+          <Link to="/funcionarios/novo">
+            <a className="hover:underline">Novo Funcionário</a>
+          </Link>
         </Button>
       </div>
 
@@ -24,21 +30,17 @@ export default function FuncionariosList() {
         {funcionarios.map((funcionario) => (
           <Card key={funcionario._id}>
             <CardContent className="flex items-center gap-4 p-4">
-              <Avatar className="w-14 h-14">
-                <AvatarImage
-                  src={funcionario.fotoUrl || '/placeholder-user.png'}
-                  alt={funcionario.nome}
-                />
-              </Avatar>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold">{funcionario.nome}</h3>
                 <p className="text-sm text-muted-foreground">{funcionario.cargo}</p>
               </div>
-              <Button
-                variant="outline"
-                asChild
-              >
-                <Link to={`/funcionarios/${funcionario._id}/dados`}>Ver Perfil</Link>
+              <Button variant="outline">
+                <Link
+                  to={`/funcionarios/${funcionario._id}/dados`}
+                  className="hover:underline"
+                >
+                  Ver Perfil
+                </Link>
               </Button>
             </CardContent>
           </Card>

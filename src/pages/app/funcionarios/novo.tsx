@@ -7,13 +7,13 @@ import { Label } from '@/components/ui/label'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/lib/axios'
 import { Card, CardContent } from '@/components/ui/card'
+import { useState } from 'react'
 
 const schema = z.object({
   nome: z.string().min(1, 'Nome obrigatório'),
-  email: z.string().email(),
+  email: z.string().email('Email inválido'),
   cargo: z.string().min(1, 'Cargo obrigatório'),
-  telefone: z.string().optional(),
-  fotoUrl: z.string().url().optional()
+  telefone: z.string().optional()
 })
 
 type FormData = z.infer<typeof schema>
@@ -24,19 +24,31 @@ export default function NovoFuncionarioPage() {
   })
 
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onSubmit = async (data: FormData) => {
+    setIsLoading(true)
+    setErrorMessage(null) // Limpa qualquer erro anterior
+
     try {
-      await api.post('/api/funcionarios', data)
+      await api.post('/funcionarios', data)
       navigate('/funcionarios')
     } catch (err) {
+      setErrorMessage('Erro ao cadastrar funcionário. Tente novamente.') // Exibe a mensagem de erro
       console.error(err)
+    } finally {
+      setIsLoading(false) // Desabilita o carregamento após o envio
     }
   }
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="p-6 max-w-2xl w-full mx-auto">
       <h1 className="text-2xl font-bold mb-4">Novo Funcionário</h1>
+
+      {errorMessage && (
+        <div className="p-4 mb-4 bg-red-100 text-red-700 rounded">{errorMessage}</div>
+      )}
 
       <Card>
         <CardContent className="p-6">
@@ -44,8 +56,13 @@ export default function NovoFuncionarioPage() {
             className="space-y-4"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div>
-              <Label htmlFor="nome">Nome</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                className="text-xs"
+                htmlFor="nome"
+              >
+                Nome
+              </Label>
               <Input
                 id="nome"
                 {...register('nome')}
@@ -55,8 +72,13 @@ export default function NovoFuncionarioPage() {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="email">Email</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                className="text-xs"
+                htmlFor="email"
+              >
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -67,8 +89,13 @@ export default function NovoFuncionarioPage() {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="cargo">Cargo</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                className="text-xs"
+                htmlFor="cargo"
+              >
+                Cargo
+              </Label>
               <Input
                 id="cargo"
                 {...register('cargo')}
@@ -78,29 +105,25 @@ export default function NovoFuncionarioPage() {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="telefone">Telefone</Label>
+            <div className="flex flex-col gap-2">
+              <Label
+                className="text-xs"
+                htmlFor="telefone"
+              >
+                Telefone
+              </Label>
               <Input
                 id="telefone"
                 {...register('telefone')}
               />
             </div>
 
-            <div>
-              <Label htmlFor="fotoUrl">URL da Foto</Label>
-              <Input
-                id="fotoUrl"
-                placeholder="https://..."
-                {...register('fotoUrl')}
-              />
-              <small className="text-muted-foreground">Aceita uma URL por enquanto</small>
-            </div>
-
             <Button
               type="submit"
               className="w-full"
+              disabled={isLoading}
             >
-              Cadastrar
+              {isLoading ? 'Cadastrando...' : 'Cadastrar'}
             </Button>
           </form>
         </CardContent>

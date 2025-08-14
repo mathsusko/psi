@@ -27,7 +27,7 @@ export default function Estoque() {
             id={card._id}
             nome={card.nome}
             // Construção dinâmica da URL da imagem
-            imagemUrl={`${apiUrl}${card.imagemUrl}`}
+            imagemUrl={`${apiUrl.replace('/api', '')}${card.imagemUrl}`}
             categoria={card.categoria}
           />
         ))}

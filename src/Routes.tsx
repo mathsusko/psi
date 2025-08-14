@@ -1,3 +1,4 @@
+import React from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import { AppLayout } from './pages/_layouts/app'
@@ -25,7 +26,7 @@ import { GerarOrcamentoServicos } from './pages/app/orcamentos/gerar-orcmaneto-s
 import { PrevisualizacaoOrcamentoDeMateriais } from './pages/app/orcamentos/previsualizacao-orcamento-material'
 import { PrevisualizacaoOrcamentoDeServicos } from './pages/app/orcamentos/previsualizacao-orcamento-servicos'
 
-// Notas Fiscais
+// Notas Fiscais (rotas globais)
 import { NotasFiscaisLista } from './pages/app/notafiscal/notas-fiscais-lista'
 import { GerarNotaFiscalOne } from './pages/app/notafiscal/gerar-nota-fiscal-one'
 import { GerarNotaFiscalTwo } from './pages/app/notafiscal/gerar-nota-fiscal-two'
@@ -35,16 +36,7 @@ import { PreviewNotaFiscal } from './pages/app/notafiscal/preview-nota-fiscal'
 // Clientes
 import Clientes from './pages/app/clientes/clientes'
 import ClienteDetalhe from './pages/app/clientes/paginaCliente/cliente-detalhe'
-
-import FiliaisDoCliente from './pages/app/clientes/paginaCliente/filiaisDoCliente'
-
-// Filial do Cliente
-import FilialProfile from './pages/app/clientes/paginaCliente/filial/[filialId]/perfil-filial'
-
-import FilialOrcamento from './pages/app/clientes/paginaCliente/filial/[filialId]/orcamento'
-
-import FilialNotasFiscais from './pages/app/clientes/paginaCliente/filial/[filialId]/notasFiscais'
-import FilialDados from './pages/app/clientes/paginaCliente/filial/[filialId]/dadosDaFilial'
+import PerfilCliente from './pages/app/clientes/perfil/[perfilId]/PerfilCliente'
 
 // Funcionários
 import FuncionariosList from './pages/app/funcionarios/index'
@@ -53,17 +45,21 @@ import FuncionarioProfileLayout from './pages/app/funcionarios/funcionario-profi
 import FuncionarioDados from './pages/app/funcionarios/funcionario-dados'
 import FuncionarioHoras from './pages/app/funcionarios/funcionario-horas'
 import FuncionarioPagamentos from './pages/app/funcionarios/funcionario-pagamentos'
+import InfoCliente from './pages/app/clientes/perfil/[perfilId]/InfoCliente'
+import DocumentosPerfil from './pages/app/clientes/perfil/[perfilId]/DocumentosPerfil'
+import OrcamentosPerfil from './pages/app/clientes/perfil/[perfilId]/OrcamentosPerfil'
 
 export const router = createBrowserRouter([
+  // ==== Layout de autenticação ====
   {
     path: '/',
     element: <AuthLayout />,
     children: [
       {
-        path: '/',
+        index: true,
         element: (
           <Navigate
-            to="/sign-in"
+            to="sign-in"
             replace
           />
         )
@@ -71,6 +67,8 @@ export const router = createBrowserRouter([
       { path: 'sign-in', element: <SignIn /> }
     ]
   },
+
+  // ==== Layout principal (requer login) ====
   {
     path: '/',
     element: (
@@ -80,6 +78,18 @@ export const router = createBrowserRouter([
     ),
     errorElement: <NotFound />,
     children: [
+      // Redireciona o root para o dashboard
+      {
+        index: true,
+        element: (
+          <Navigate
+            to="dashboard"
+            replace
+          />
+        )
+      },
+
+      // Dashboard
       { path: 'dashboard', element: <Dashboard /> },
 
       // Estoque
@@ -93,17 +103,12 @@ export const router = createBrowserRouter([
       // Clientes
       { path: 'clientes', element: <Clientes /> },
       {
-        path: 'clientes/:id',
-        element: <ClienteDetalhe />,
-        children: [{ path: 'filiais', element: <FiliaisDoCliente /> }]
-      },
-      {
-        path: 'clientes/filial/:filialId',
-        element: <FilialProfile />,
+        path: 'clientes/:clienteId',
+        element: <PerfilCliente />, // Componente principal que irá renderizar as sub-rotas
         children: [
-          { path: 'orcamento', element: <FilialOrcamento /> },
-          { path: 'notas-fiscais', element: <FilialNotasFiscais /> },
-          { path: 'dados-da-filial', element: <FilialDados /> }
+          { path: 'perfil', element: <InfoCliente /> }, // Sub-rota para informações do cliente
+          { path: 'documentos', element: <DocumentosPerfil /> }, // Sub-rota para documentos
+          { path: 'orcamentos', element: <OrcamentosPerfil /> } // Sub-rota para orçamentos
         ]
       },
 
@@ -133,12 +138,8 @@ export const router = createBrowserRouter([
         path: 'previsualizacao-orcamento-servicos/:id',
         element: <PrevisualizacaoOrcamentoDeServicos />
       },
-      {
-        path: 'previsualizacao-orcamento-servicos',
-        element: <PrevisualizacaoOrcamentoDeServicos />
-      },
 
-      // Notas Fiscais
+      // Notas Fiscais (globais)
       { path: 'notas-fiscais-lista', element: <NotasFiscaisLista /> },
       { path: 'gerar-nota-fiscal-one', element: <GerarNotaFiscalOne /> },
       { path: 'gerar-nota-fiscal-two', element: <GerarNotaFiscalTwo /> },
@@ -146,6 +147,8 @@ export const router = createBrowserRouter([
       { path: 'preview-nota-fiscal', element: <PreviewNotaFiscal /> }
     ]
   },
+
+  // ==== Fallback 404 ====
   {
     path: '*',
     element: <NotFound />

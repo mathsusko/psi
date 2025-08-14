@@ -1,91 +1,6 @@
-// import { useState } from 'react'
-// import { Button } from '@/components/ui/button'
-// import {
-//   Table,
-//   TableHeader,
-//   TableRow,
-//   TableHead,
-//   TableBody,
-//   TableCell
-// } from '@/components/ui/table'
-// import { ModalNovoCliente } from './ModalNovoCliente'
-// import { useQuery } from '@tanstack/react-query'
-// import axios from 'axios'
-// import { useNavigate } from 'react-router-dom'
-
-// const API_URL = `${import.meta.env.VITE_API_URL}/clientes`
-
-// const fetchClientes = async () => {
-//   const response = await axios.get(API_URL)
-//   return response.data
-// }
-
-// export default function Clientes() {
-//   const [openModal, setOpenModal] = useState(false)
-//   const navigate = useNavigate()
-
-//   const {
-//     data: clientes,
-//     isLoading,
-//     isError
-//   } = useQuery({
-//     queryKey: ['clientes'],
-//     queryFn: fetchClientes
-//   })
-
-//   const handleOpenModal = () => {
-//     setOpenModal(true)
-//   }
-
-//   const verPerfil = (id: string) => {
-//     navigate(`/clientes/${id}/filiais`)
-//   }
-
-//   if (isLoading) return <div>Carregando...</div>
-//   if (isError) return <div>Erro ao carregar clientes</div>
-
-//   return (
-//     <div className="p-6 space-y-6">
-//       <div className="flex items-center justify-between">
-//         <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
-//         <div className="flex items-center gap-2">
-//           <Button onClick={handleOpenModal}>+ Adicionar cliente</Button>
-//         </div>
-//       </div>
-
-//       <div className="rounded-xl border bg-background shadow-sm overflow-x-auto">
-//         <Table>
-//           <TableHeader>
-//             <TableRow>
-//               <TableHead>Nome da empresa</TableHead>
-//               <TableHead className="flex justify-end px-[100px] items-center">
-//                 Ações
-//               </TableHead>
-//             </TableRow>
-//           </TableHeader>
-
-//           <TableBody>
-//             {clientes.map((cliente: any) => (
-//               <TableRow key={cliente._id}>
-//                 <TableCell>{cliente.nomeEmpresa}</TableCell>
-//                 <TableCell className="flex justify-end px-[100px] items-center">
-//                   <Button onClick={() => verPerfil(cliente._id)}>Ver perfil</Button>
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </div>
-
-//       <ModalNovoCliente
-//         open={openModal}
-//         onOpenChange={setOpenModal}
-//       />
-//     </div>
-//   )
-// }
-
-import { useState } from 'react'
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -95,96 +10,81 @@ import {
   TableBody,
   TableCell
 } from '@/components/ui/table'
+import { toast } from 'sonner'
+import { ClientesService, Cliente } from '@/api/clientes'
 import { ModalNovoCliente } from './ModalNovoCliente'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
-import { Trash } from 'lucide-react'
-
-const API_URL = `${import.meta.env.VITE_API_URL}/clientes`
-
-const fetchClientes = async () => {
-  const response = await axios.get(API_URL)
-  return response.data
-}
-
-const excluirClienteAPI = async (id: string) => {
-  await axios.delete(`${API_URL}/${id}`)
-}
 
 export default function Clientes() {
-  const [openModal, setOpenModal] = useState(false)
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
+  // 1) Busca lista de clientes
   const {
-    data: clientes,
+    data: clientes = [],
     isLoading,
-    isError,
-    refetch
-  } = useQuery({
+    isError
+  } = useQuery<Cliente[]>({
     queryKey: ['clientes'],
-    queryFn: fetchClientes
+    queryFn: ClientesService.listar,
+    onError: () => toast.error('Erro ao carregar clientes.') // Mensagem de erro ao buscar os clientes
   })
 
-  const { mutate: excluirCliente } = useMutation({
-    mutationFn: excluirClienteAPI,
+  // 2) Mutação de exclusão (objeto de opções, não args separados)
+  const excluirMutation = useMutation({
+    mutationFn: (id: string) => ClientesService.deletar(id),
     onSuccess: () => {
-      // Refaz a busca dos clientes após a exclusão
-      refetch()
+      toast.success('Cliente excluído com sucesso!')
+      queryClient.invalidateQueries(['clientes'])
     },
     onError: () => {
       toast.error('Erro ao excluir cliente.')
     }
   })
 
-  const handleOpenModal = () => {
-    setOpenModal(true)
+  const handleVerPerfil = (id: string) => {
+    // Navegar para o perfil do cliente
+    navigate(`/clientes/${id}/perfil`)
   }
 
-  const verPerfil = (id: string) => {
-    navigate(`/clientes/${id}/filiais`)
+  const handleExcluir = (id: string) => {
+    excluirMutation.mutate(id)
   }
 
-  if (isLoading) return <div>Carregando...</div>
-  if (isError) return <div>Erro ao carregar clientes</div>
+  if (isLoading) return <div>Carregando clientes...</div>
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
-        <div className="flex items-center gap-2">
-          <Button onClick={handleOpenModal}>+ Adicionar cliente</Button>
-        </div>
+        <h1 className="text-2xl font-bold">Clientes</h1>
+        <ModalNovoCliente /> {/* Modal para adicionar novo cliente */}
       </div>
 
+      {/* Tabela para exibir os clientes */}
       <div className="rounded-xl border bg-background shadow-sm overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nome da empresa</TableHead>
-              <TableHead className="flex justify-end px-[100px] items-center">
-                Ações
-              </TableHead>
+              <TableHead>Nome da Empresa</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {clientes.map((cliente: any) => (
+            {clientes.map((cliente) => (
               <TableRow key={cliente._id}>
                 <TableCell>{cliente.nomeEmpresa}</TableCell>
-                <TableCell className="flex justify-end px-[60px] items-center">
-                  {/* Botão "Ver perfil" */}
-                  <Button onClick={() => verPerfil(cliente._id)}>Ver perfil</Button>
-
-                  {/* Ícone de lixeira */}
+                <TableCell className="flex justify-end space-x-2">
+                  <Button onClick={() => handleVerPerfil(cliente._id!)}>
+                    Acessar Perfil
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     title="Excluir"
-                    onClick={() => excluirCliente(cliente._id)} // Função de exclusão
-                    className="ml-2"
+                    onClick={() => handleExcluir(cliente._id!)}
+                    disabled={excluirMutation.isLoading}
                   >
-                    <Trash className="w-4 h-4 text-red-600" />
+                    Excluir
                   </Button>
                 </TableCell>
               </TableRow>
@@ -192,11 +92,6 @@ export default function Clientes() {
           </TableBody>
         </Table>
       </div>
-
-      <ModalNovoCliente
-        open={openModal}
-        onOpenChange={setOpenModal}
-      />
     </div>
   )
 }

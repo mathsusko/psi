@@ -33,6 +33,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement
 
+    // Remover as classes existentes
     root.classList.remove('light', 'dark')
 
     if (theme === 'system') {
@@ -44,14 +45,15 @@ export function ThemeProvider({
       return
     }
 
+    // Adicionar a classe correspondente ao tema selecionado
     root.classList.add(theme)
   }, [theme])
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      localStorage.setItem(storageKey, theme) // Armazenar o tema selecionado no localStorage
+      setTheme(theme) // Atualizar o estado do tema
     }
   }
 

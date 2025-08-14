@@ -40,13 +40,11 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
   const { itens } = useItemCard(id)
 
   useEffect(() => {
-    const total = itens?.reduce(
-      (acc: number, item: any) => acc + Number(item.quantidade || 0),
-      0
-    )
+    const total = itens?.reduce((acc, item) => acc + Number(item.quantidade || 0), 0)
     setQuantidadeTotal(total || 0)
   }, [itens])
 
+  // Função para salvar as alterações no card
   const handleSave = async (
     novoNome: string,
     novaCategoria: string,
@@ -55,21 +53,23 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
     try {
       const response = await editarCard({
         id,
-        data: {
-          nome: novoNome,
-          categoria: novaCategoria, // agora aceita
-          imagem: novaImagem
-        }
+        data: { nome: novoNome, categoria: novaCategoria, imagem: novaImagem }
       })
-
       setNomeEditado(response.data.nome)
       setCategoriaEditada(response.data.categoria)
-      setImagemEditada(`${import.meta.env.VITE_API_URL}${response.data.imagemUrl}`)
+
+      // Corrigindo o caminho da imagem
+      const imageUrl = response.data.imagemUrl.startsWith('http')
+        ? response.data.imagemUrl
+        : `${import.meta.env.VITE_API_URL}/api/uploads/${response.data.imagemUrl || 'placeholder.png'}`
+
+      setImagemEditada(imageUrl) // Atualizando a URL da imagem
     } catch (error) {
       console.error('Erro ao editar card:', error)
     }
   }
 
+  // Função para confirmar exclusão do card
   const handleConfirmDelete = async () => {
     try {
       setIsLoadingDelete(true)
@@ -82,6 +82,7 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
     }
   }
 
+  // Funções de controle de modais
   const handleCancelDelete = () => setIsConfirmDeleteOpen(false)
   const handleEdit = () => setIsModalOpen(true)
   const handleDelete = () => setIsConfirmDeleteOpen(true)
@@ -104,8 +105,11 @@ export function CardEstoque({ id, nome, imagemUrl, categoria }: CardEstoqueProps
       </div>
 
       <div className="w-full h-60 mb-4 flex justify-center items-center rounded-lg">
+        {/* Ajustando a URL da imagem para garantir que o caminho esteja correto */}
         <img
-          src={imagemEditada || '/placeholder.png'}
+          src={
+            imagemEditada || `${import.meta.env.VITE_API_URL}/api/uploads/placeholder.png`
+          }
           alt={nomeEditado}
           className="w-full h-full object-cover rounded-lg"
         />

@@ -24,7 +24,12 @@ export function App() {
           <AuthProvider>
             {' '}
             {/* <-- Envolvendo com AuthProvider */}
-            <RouterProvider router={router} />
+            {/* <RouterProvider router={router} /> */}
+            <RouterProvider
+              router={router}
+              fallbackElement={<div>Carregando rota...</div>}
+              basename="/"
+            />
           </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>

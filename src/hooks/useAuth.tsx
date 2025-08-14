@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from 'react'
 
 interface User {
@@ -9,6 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null
   token: string | null
+  isLoading: boolean
   login: (user: User, token: string) => void
   logout: () => void
 }
@@ -18,6 +20,7 @@ const AuthContext = createContext({} as AuthContextType)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     try {
@@ -25,13 +28,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const savedUser = localStorage.getItem('usuario')
 
       if (savedToken && savedUser) {
-        const parsedUser = JSON.parse(savedUser)
-        setUser(parsedUser)
+        setUser(JSON.parse(savedUser))
         setToken(savedToken)
       }
     } catch (err) {
       console.error('Erro ao restaurar sessão:', err)
       localStorage.clear()
+    } finally {
+      setIsLoading(false)
     }
   }, [])
 
@@ -49,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )
@@ -58,4 +62,3 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   return useContext(AuthContext)
 }
-  

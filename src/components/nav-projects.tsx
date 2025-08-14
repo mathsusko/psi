@@ -1,3 +1,5 @@
+'use client'
+
 import { Folder, Forward, MoreHorizontal, Trash2, type LucideIcon } from 'lucide-react'
 
 import {
@@ -15,17 +17,20 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar
-} from '@/components/ui/sidebar'
+}
 
-export function NavProjects({
-  projects
-}: {
-  projects: {
-    name: string
-    url: string
-    icon: LucideIcon
-  }[]
-}) {
+// Tipagem para os projetos
+type Project = {
+  name: string
+  url: string
+  icon: LucideIcon
+}
+
+interface NavProjectsProps {
+  projects: Project[]
+}
+
+export function NavProjects({ projects }: NavProjectsProps) {
   const { isMobile } = useSidebar()
 
   return (
@@ -35,7 +40,7 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <a href={item.url} className="flex items-center gap-2">
                 <item.icon />
                 <span>{item.name}</span>
               </a>

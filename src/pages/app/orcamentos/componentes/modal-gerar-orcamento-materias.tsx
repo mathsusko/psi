@@ -71,7 +71,7 @@ export function DialogAddMateriais({ onAdd }: DialogAddMateriaisProps) {
             </label>
             {state.imagem ? (
               <img
-                src={`${import.meta.env.VITE_API_URL}${state.imagem}`} // Construção da URL
+                src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${state.imagem}`} // Construção da URL
                 alt={state.nome || 'Imagem do material'}
                 className="w-[227px] h-[227px] object-contain border rounded-sm"
               />

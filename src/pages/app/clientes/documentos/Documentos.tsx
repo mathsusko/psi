@@ -1,6 +1,4 @@
-import React, { useRef, useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/lib/axios'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -10,125 +8,54 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-
-type Documento = {
-  _id: string
-  clienteId: string
-  descricao: string
-  url: string
-  createdAt: string
-}
+import ModalAdicionarDocumento from './ModalAdicionarDocumento'
+import { useDocumentos } from '@/hooks/useDocumentos'
 
 const Documentos = ({ clienteId }: { clienteId: string }) => {
-  const qc = useQueryClient()
-
-  // === form local (upload) ===
-  const fileRef = useRef<HTMLInputElement | null>(null)
-  const [descricao, setDescricao] = useState('')
-
-  // === GET lista ===
-  const {
-    data: documentos = [],
-    isLoading,
-    isError
-  } = useQuery({
-    queryKey: ['documentos', clienteId],
-    queryFn: async () => {
-      const { data } = await api.get<Documento[]>(`/api/documentos/${clienteId}`)
-      return data
-    },
-    enabled: !!clienteId
-  })
-
-  // === POST upload ===
-  const uploadMutation = useMutation({
-    mutationFn: async ({ file, descricao }: { file: File; descricao: string }) => {
-      const fd = new FormData()
-      fd.append('file', file)
-      fd.append('descricao', descricao ?? '')
-      const { data } = await api.post(`/api/documentos/upload/${clienteId}`, fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      return data
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['documentos', clienteId] })
-      // reset form
-      setDescricao('')
-      if (fileRef.current) fileRef.current.value = ''
-    }
-  })
-
-  // === DELETE ===
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { data } = await api.delete(`/api/documentos/${id}`)
-      return data
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['documentos', clienteId] })
-    }
-  })
-
-  // === handlers ===
-  const handleUpload = () => {
-    const file = fileRef.current?.files?.[0]
-    if (!file) return
-    uploadMutation.mutate({ file, descricao })
-  }
+  const [open, setOpen] = useState(false) // Controle do estado do modal
+  const { documentos, isLoading, isError, upload, deletar, atualizarDescricao } =
+    useDocumentos(clienteId)
 
   const handleDownload = (url: string) => {
-    // abre o arquivo servido por /uploads/documentos/*
     window.open(url, '_blank')
+  }
+
+  const handleDelete = (documentoId: string) => {
+    deletar.mutate(documentoId)
+  }
+
+  const handleDescricaoChange = (documentoId: string, descricao: string) => {
+    atualizarDescricao.mutate({ id: documentoId, descricao })
+  }
+
+  const handleUploadSuccess = () => {
+    // Atualizar a lista de documentos após o upload
+    setOpen(false)
   }
 
   return (
     <div className="p-4 space-y-4 bg-sidebar mt-3.5 rounded-2xl">
-      <h2 className="text-lg font-semibold">Documentos do cliente</h2>
-
-      {/* Formulário simples de upload */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-        <div>
-          <Label className="mb-1 block">Arquivo</Label>
-          <Input
-            ref={fileRef}
-            type="file"
-            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
-          />
-        </div>
-        <div>
-          <Label className="mb-1 block">Descrição (opcional)</Label>
-          <Input
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
-            placeholder="Ex: RG escaneado, contrato, etc."
-          />
-        </div>
-        <div>
-          <Button
-            className="w-full"
-            onClick={handleUpload}
-            disabled={uploadMutation.isPending}
-          >
-            {uploadMutation.isPending ? 'Enviando...' : 'Enviar documento'}
-          </Button>
-        </div>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Documentos gerais</h2>
+        <ModalAdicionarDocumento
+          open={open}
+          onOpenChange={setOpen}
+          onUploadSuccess={handleUploadSuccess}
+          clienteId={clienteId}
+        />
       </div>
 
-      {/* Tabela */}
+      {/* Tabela de Documentos */}
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Nome do Documento</TableHead>
             <TableHead>Descrição</TableHead>
-            <TableHead>Enviado em</TableHead>
-            <TableHead className="text-right">Ações</TableHead>
+            <TableHead>Ações</TableHead>
           </TableRow>
         </TableHeader>
-
         <TableBody>
-          {isLoading && (
+          {isLoading ? (
             <TableRow>
               <TableCell
                 colSpan={3}
@@ -137,9 +64,7 @@ const Documentos = ({ clienteId }: { clienteId: string }) => {
                 Carregando...
               </TableCell>
             </TableRow>
-          )}
-
-          {isError && (
+          ) : isError ? (
             <TableRow>
               <TableCell
                 colSpan={3}
@@ -148,9 +73,7 @@ const Documentos = ({ clienteId }: { clienteId: string }) => {
                 Erro ao carregar documentos
               </TableCell>
             </TableRow>
-          )}
-
-          {!isLoading && !isError && documentos.length === 0 && (
+          ) : documentos.length === 0 ? (
             <TableRow>
               <TableCell
                 colSpan={3}
@@ -159,33 +82,31 @@ const Documentos = ({ clienteId }: { clienteId: string }) => {
                 Nenhum documento encontrado.
               </TableCell>
             </TableRow>
+          ) : (
+            documentos.map((documento) => (
+              <TableRow key={documento._id}>
+                <TableCell>{documento.descricao}</TableCell>
+                <TableCell>{documento.descricao}</TableCell> {/* Descrição */}
+                <TableCell className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(documento.url)}
+                  >
+                    Baixar
+                  </Button>
+                  
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(documento._id)}
+                  >
+                    Deletar
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
           )}
-
-          {documentos.map((doc) => (
-            <TableRow key={doc._id}>
-              <TableCell className="max-w-[420px] truncate">
-                {doc.descricao || '-'}
-              </TableCell>
-              <TableCell>{new Date(doc.createdAt).toLocaleString()}</TableCell>
-              <TableCell className="text-right space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(doc.url)}
-                >
-                  Baixar
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => deleteMutation.mutate(doc._id)}
-                  disabled={deleteMutation.isPending}
-                >
-                  Deletar
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
         </TableBody>
       </Table>
     </div>

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 
 interface Cliente {
   nomeEmpresa: string
-  cnpj: string
+  cnpjCpf: string
   ie: string
   email: string
   telefone: string
@@ -102,7 +102,7 @@ interface Prestador {
 }
 
 interface OrcamentoServico {
-  filialId: Cliente
+  clienteId: Cliente
   prestadorId: Prestador
   dataInicio: string
   dataSaida: string
@@ -134,7 +134,7 @@ export const OrcamentoServicoPDF = ({ orcamento }: { orcamento: OrcamentoServico
                 </Text>
                 <View style={styles.prestadorInfoOne}>
                   <Text style={styles.prestadorInfoText}>
-                    CNPJ: {orcamento.prestadorId?.cnpj}
+                    CNPJ/CPF: {orcamento.prestadorId?.cnpj}
                   </Text>
                   <Text style={styles.prestadorInfoText}>
                     I.E: {orcamento.prestadorId?.ie}
@@ -179,23 +179,25 @@ export const OrcamentoServicoPDF = ({ orcamento }: { orcamento: OrcamentoServico
               <Text style={styles.titleClient}>Dados do Cliente</Text>
               <View style={styles.infoClient}>
                 <Text style={styles.textClient}>
-                  Cliente: {orcamento.filialId?.nomeEmpresa}
+                  Cliente: {orcamento.clienteId?.nomeEmpresa}
                 </Text>
-                <Text style={styles.textClient}>CNPJ: {orcamento.filialId?.cnpj}</Text>
-                <Text style={styles.textClient}>I.E: {orcamento.filialId?.ie}</Text>
+                <Text style={styles.textClient}>
+                  CNPJ/CPF: {orcamento.clienteId?.cnpjCpf}
+                </Text>
+                <Text style={styles.textClient}>I.E: {orcamento.clienteId?.ie}</Text>
               </View>
             </View>
             <View style={styles.clientInfoTwo}>
               <Text style={styles.textClient}>
-                Telefone: {orcamento.filialId?.telefone}
+                Telefone: {orcamento.clienteId?.telefone}
               </Text>
-              <Text style={styles.textClient}>Email: {orcamento.filialId?.email}</Text>
+              <Text style={styles.textClient}>Email: {orcamento.clienteId?.email}</Text>
               <Text style={styles.textClient}>
-                Endereço: {orcamento.filialId?.endereco},{' '}
-                {orcamento.filialId?.numeroEndereco}
+                Endereço: {orcamento.clienteId?.endereco},{' '}
+                {orcamento.clienteId?.numeroEndereco}
               </Text>
               <Text style={styles.textClient}>
-                {orcamento.filialId?.cidade} - {orcamento.filialId?.estado}
+                {orcamento.clienteId?.cidade} - {orcamento.clienteId?.estado}
               </Text>
             </View>
           </View>
@@ -212,7 +214,7 @@ export const OrcamentoServicoPDF = ({ orcamento }: { orcamento: OrcamentoServico
           <View style={styles.assTwo}>
             <Text style={styles.assText}>Cliente</Text>
             <Text style={styles.assText}>
-              {orcamento.filialId?.nomeEmpresa || 'Consumidor Final'}
+              {orcamento.clienteId?.nomeEmpresa || 'Consumidor Final'}
             </Text>
           </View>
           <View style={styles.assThree}>

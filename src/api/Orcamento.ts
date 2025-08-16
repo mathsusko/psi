@@ -3,7 +3,7 @@ import { api } from '@/lib/axios'
 // DTO para criação de orçamento
 export interface OrcamentoDTO {
   prestadorId: string
-  filialId: string // ✅ substituído clienteId por filialId
+  clienteId: string // Alterado para clienteId
   custo?: number
   dataInicio?: string
   dataSaida?: string
@@ -20,7 +20,8 @@ export interface OrcamentoResponse {
     email: string
     [key: string]: any
   }
-  filialId: {
+  clienteId: {
+    // Alterado para clienteId
     _id: string
     nomeEmpresa: string
     cnpjCpf: string
@@ -54,7 +55,7 @@ export async function getOrcamento(id: string): Promise<OrcamentoResponse> {
   return res.data
 }
 
-// Deletar orcamento
+// Deletar orçamento
 export async function deleteOrcamento(id: string) {
   const response = await api.delete(`/orcamentos/${id}`)
   return response.data
@@ -63,7 +64,7 @@ export async function deleteOrcamento(id: string) {
 // Lista orçamentos com filtros opcionais
 export async function listOrcamentos(filtros?: {
   prestadorId?: string
-  filialId?: string // ✅ atualizado também aqui
+  clienteId?: string // Alterado de filialId para clienteId
 }): Promise<OrcamentoResponse[]> {
   const res = await api.get<OrcamentoResponse[]>('/orcamentos', { params: filtros })
   return res.data

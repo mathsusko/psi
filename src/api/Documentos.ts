@@ -1,17 +1,38 @@
 import { api } from '@/lib/axios'
 
 export const DocumentosService = {
-  getPorCliente(clienteId: string) {
-    return api.get(`/api/documentos/${clienteId}`).then((r) => r.data)
+  // Função para obter os documentos de um cliente
+  async getPorCliente(clienteId: string) {
+    try {
+      const response = await api.get(`/api/documentos/${clienteId}`)
+      return response.data
+    } catch (error) {
+      console.error('Erro ao buscar documentos:', error)
+      throw new Error('Erro ao buscar documentos')
+    }
   },
-  upload(clienteId: string, formData: FormData) {
-    return api
-      .post(`/api/documentos/upload/${clienteId}`, formData, {
+
+  // Função para fazer upload de um documento
+  async upload(clienteId: string, formData: FormData) {
+    try {
+      const response = await api.post(`/api/documentos/upload/${clienteId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
-      .then((r) => r.data)
+      return response.data
+    } catch (error) {
+      console.error('Erro ao enviar o documento:', error)
+      throw new Error('Erro ao enviar o documento')
+    }
   },
-  deletar(id: string) {
-    return api.delete(`/api/documentos/${id}`).then((r) => r.data)
+
+  // Função para deletar um documento
+  async deletar(id: string) {
+    try {
+      const response = await api.delete(`/api/documentos/${id}`)
+      return response.data
+    } catch (error) {
+      console.error('Erro ao deletar documento:', error)
+      throw new Error('Erro ao deletar documento')
+    }
   }
 }

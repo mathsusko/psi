@@ -10,13 +10,13 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 
 import { DadosPrestador } from './DadosPrestador'
-import { DadosClienteFilial } from './DadosCliente'
+import { DadosCliente } from './DadosCliente' // Renomeado para refletir que é cliente
 import { createOrcamento, OrcamentoDTO } from '@/api/Orcamento'
 
 export function GerarOrcamentoServicos() {
   const navigate = useNavigate()
 
-  const [filialId, setFilialId] = useState('')
+  const [clienteId, setClienteId] = useState('') // Renomeado para clienteId
   const [prestadorId, setPrestadorId] = useState('')
   const [descricaoServico, setDescricaoServico] = useState('')
   const [custoBRL, setCustoBRL] = useState('R$ 0,00')
@@ -38,7 +38,7 @@ export function GerarOrcamentoServicos() {
   }
 
   const handleConcluir = async () => {
-    if (!dataInicio || !dataSaida || !filialId || !prestadorId) {
+    if (!dataInicio || !dataSaida || !clienteId || !prestadorId) {
       console.warn('Preencha todos os campos obrigatórios.')
       return
     }
@@ -47,7 +47,7 @@ export function GerarOrcamentoServicos() {
     try {
       const orcDto: OrcamentoDTO = {
         prestadorId,
-        filialId, // ✅ corrigido
+        clienteId, // Atualizado para clienteId
         custo: custoNum,
         dataInicio: new Date(dataInicio).toISOString(),
         dataSaida: new Date(dataSaida).toISOString(),
@@ -83,7 +83,8 @@ export function GerarOrcamentoServicos() {
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground">
         <DadosPrestador onSelectPrestador={setPrestadorId} />
         <Separator className="mt-8 mb-4" />
-        <DadosClienteFilial onSelectFilial={setFilialId} />
+        <DadosCliente onSelectCliente={setClienteId} />{' '}
+        {/* Renomeado para DadosCliente */}
       </div>
 
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground flex gap-4">
@@ -150,7 +151,7 @@ export function GerarOrcamentoServicos() {
       <div className="flex justify-end p-4">
         <Button
           onClick={handleConcluir}
-          disabled={isSaving || !dataInicio || !dataSaida || !filialId || !prestadorId}
+          disabled={isSaving || !dataInicio || !dataSaida || !clienteId || !prestadorId}
         >
           {isSaving ? 'Salvando...' : 'Concluir'}
         </Button>

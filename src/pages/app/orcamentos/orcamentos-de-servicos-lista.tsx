@@ -111,7 +111,7 @@ export function OrcamentoDeServicosLista() {
           <TableHeader>
             <TableRow>
               <TableHead className="text-muted-foreground">Data de criação</TableHead>
-              <TableHead className="text-muted-foreground">Filial (CNPJ)</TableHead>
+              <TableHead className="text-muted-foreground">Cliente (CNPJ/CPF)</TableHead>
               <TableHead className="text-muted-foreground">Custo</TableHead>
               <TableHead className="text-muted-foreground text-center">Ações</TableHead>
             </TableRow>

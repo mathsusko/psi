@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table'
 import { MoveLeft, Plus, Delete } from 'lucide-react'
 import { DadosPrestador } from './DadosPrestador'
-import { DadosClienteFilial } from './DadosCliente'
+import { DadosCliente } from './DadosCliente' // Alterado para DadosCliente
 import { DialogAddMateriais } from './componentes/modal-gerar-orcamento-materias'
 
 import { useMateriaisList } from '@/hooks/useMateriaisList'
@@ -26,7 +26,7 @@ import { Separator } from '@/components/ui/separator'
 export function GerarOrcamentoMateriais() {
   const navigate = useNavigate()
 
-  const [filialId, setFilialId] = useState('')
+  const [clienteId, setClienteId] = useState('')
   const [prestadorId, setPrestadorId] = useState('')
   const [custoBRL, setCustoBRL] = useState('R$ 0,00')
   const [custoNum, setCustoNum] = useState(0)
@@ -35,20 +35,25 @@ export function GerarOrcamentoMateriais() {
   const { itens, addItem, removeItem } = useMateriaisList()
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleCustoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const onlyDigits = e.target.value.replace(/\D/g, '')
-    const value = parseInt(onlyDigits || '0', 10) / 100
-    setCustoNum(value)
+  // Função para calcular o custo total
+  const calculateCusto = () => {
+    const total = itens.reduce((acc, item) => acc + item.quantidade * item.precoUn, 0)
+    setCustoNum(total)
     setCustoBRL(
       new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
-      }).format(value)
+      }).format(total)
     )
   }
 
+  // UseEffect para recalcular o custo sempre que os itens mudarem
+  useEffect(() => {
+    calculateCusto()
+  }, [itens])
+
   const handleConcluir = async () => {
-    if (!dataInicio || !dataSaida || itens.length === 0 || !filialId || !prestadorId) {
+    if (!dataInicio || !dataSaida || itens.length === 0 || !clienteId || !prestadorId) {
       console.warn('Preencha todos os campos obrigatórios.')
       return
     }
@@ -57,7 +62,7 @@ export function GerarOrcamentoMateriais() {
     try {
       const orcDto: OrcamentoDTO = {
         prestadorId,
-        filialId, // ✅ campo correto
+        clienteId,
         custo: custoNum,
         dataInicio: new Date(dataInicio).toISOString(),
         dataSaida: new Date(dataSaida).toISOString()
@@ -109,7 +114,7 @@ export function GerarOrcamentoMateriais() {
           className="mt-[32px]"
           orientation="horizontal"
         />
-        <DadosClienteFilial onSelectFilial={(id) => setFilialId(id)} />
+        <DadosCliente onSelectCliente={(id) => setClienteId(id)} />
       </div>
 
       <div className="p-4 bg-sidebar rounded-xl text-sidebar-foreground flex gap-4">
@@ -123,8 +128,9 @@ export function GerarOrcamentoMateriais() {
           <Input
             id="custo"
             value={custoBRL}
-            onChange={handleCustoChange}
+            onChange={(e) => {}}
             placeholder="R$ 0,00"
+            disabled
           />
         </div>
         <div className="flex flex-col w-full">
@@ -178,7 +184,7 @@ export function GerarOrcamentoMateriais() {
                 <TableRow key={idx}>
                   <TableCell>
                     <img
-                      src={`${import.meta.env.VITE_API_URL}${item.imagem}`}
+                      src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${item.imagem}`}
                       alt={item.nome}
                       className="w-16 h-16 object-contain border rounded-sm"
                     />
@@ -224,7 +230,7 @@ export function GerarOrcamentoMateriais() {
             itens.length === 0 ||
             !dataInicio ||
             !dataSaida ||
-            !filialId ||
+            !clienteId ||
             !prestadorId
           }
         >

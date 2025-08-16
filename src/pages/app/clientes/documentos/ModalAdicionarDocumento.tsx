@@ -1,5 +1,3 @@
-// src/pages/app/clientes/documentos/ModalAdicionarDocumento.tsx
-
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -10,7 +8,7 @@ interface ModalAdicionarDocumentoProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onUploadSuccess: () => void
-  clienteId: string // Agora obrigatório
+  clienteId: string
 }
 
 const ModalAdicionarDocumento = ({
@@ -35,13 +33,12 @@ const ModalAdicionarDocumento = ({
       const formData = new FormData()
       formData.append('file', selectedFile)
       formData.append('descricao', descricao)
-      formData.append('nome', selectedFile.name) // Envia nome se necessário
 
-      await DocumentosService.uploadDocumento(clienteId, formData)
+      // Chama o método de upload correto
+      const documento = await DocumentosService.upload(clienteId, formData)
 
       alert('Documento enviado com sucesso!')
 
-      // Limpa estado e fecha modal
       setDescricao('')
       setSelectedFile(null)
       onOpenChange(false)

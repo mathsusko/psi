@@ -87,7 +87,7 @@ export function PrevisualizacaoOrcamentoDeServicos() {
             </div>
             <div className="w-full flex flex-col space-y-2.5 text-sm">
               <p>{orcamento.clienteId?.nomeEmpresa}</p>
-              <p>{orcamento.clienteId?.cnpj}</p>
+              <p>{orcamento.clienteId?.cnpjCpf}</p>
               <p>
                 {orcamento.clienteId?.endereco}, {orcamento.clienteId?.numeroEndereco}
               </p>

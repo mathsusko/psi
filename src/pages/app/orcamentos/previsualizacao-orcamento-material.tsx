@@ -53,21 +53,21 @@ export function PrevisualizacaoOrcamentoDeMateriais() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="border p-3 rounded bg-muted">
-            <h2 className="font-semibold text-sm mb-2">Filial</h2>
-            {renderInfo('Empresa', orcamento.filialId?.nomeEmpresa)}
-            {renderInfo('Email', orcamento.filialId?.email)}
-            {renderInfo('Telefone', orcamento.filialId?.telefone)}
-            {renderInfo('CNPJ/CPF', orcamento.filialId?.cnpjCpf)}
+            <h2 className="font-semibold text-sm mb-2">Cliente</h2>
+            {renderInfo('Empresa', orcamento.clienteId?.nomeEmpresa)}
+            {renderInfo('Email', orcamento.clienteId?.email)}
+            {renderInfo('Telefone', orcamento.clienteId?.telefone)}
+            {renderInfo('CNPJ/CPF', orcamento.clienteId?.cnpjCpf)}
             {renderInfo(
               'Endereço',
-              `${orcamento.filialId?.endereco}, ${orcamento.filialId?.numeroEndereco}`
+              `${orcamento.clienteId?.endereco}, ${orcamento.clienteId?.numeroEndereco}`
             )}
             {renderInfo(
               'Cidade',
-              `${orcamento.filialId?.cidade} - ${orcamento.filialId?.estado}`
+              `${orcamento.clienteId?.cidade} - ${orcamento.clienteId?.estado}`
             )}
-            {renderInfo('CEP', orcamento.filialId?.cep)}
-            {renderInfo('IE', orcamento.filialId?.ie)}
+            {renderInfo('CEP', orcamento.clienteId?.cep)}
+            {renderInfo('IE', orcamento.clienteId?.ie)}
           </div>
 
           <div className="border p-3 rounded bg-muted">
@@ -131,7 +131,7 @@ export function PrevisualizacaoOrcamentoDeMateriais() {
                 <TableRow key={idx}>
                   <TableCell>
                     <img
-                      src={`${import.meta.env.VITE_API_URL}${item.imagem}`}
+                      src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${item.imagem}`}
                       alt={item.nome}
                       className="w-16 h-16 object-contain border rounded-sm"
                     />

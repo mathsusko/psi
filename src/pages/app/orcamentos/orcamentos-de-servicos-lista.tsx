@@ -23,12 +23,12 @@ export function OrcamentoDeServicosLista() {
   const [selectedOrcamento, setSelectedOrcamento] = useState<any | null>(null)
   const [loadingOrcamentoId, setLoadingOrcamentoId] = useState<string | null>(null)
   const [searchParams] = useSearchParams()
-  const filialId = searchParams.get('filialId')
+  const clienteId = searchParams.get('clienteId')
 
   useEffect(() => {
     async function fetchOrcamentos() {
       try {
-        const params = filialId ? { filialId } : {}
+        const params = clienteId ? { clienteId } : {}
         const data = await getAllOrcamentos(params)
         const servicos = data.filter((o) => !!o.descricaoServico)
         setOrcamentos(servicos)
@@ -38,7 +38,7 @@ export function OrcamentoDeServicosLista() {
     }
 
     fetchOrcamentos()
-  }, [filialId])
+  }, [clienteId])
 
   const handleDownload = async (id: string) => {
     try {
@@ -122,10 +122,10 @@ export function OrcamentoDeServicosLista() {
               <TableRow key={orcamento._id}>
                 <TableCell>{formatDate(orcamento.createdAt)}</TableCell>
                 <TableCell>
-                  {orcamento.filialId?.nomeEmpresa ?? 'Sem nome'} <br />
+                  {orcamento.clienteId?.nomeEmpresa ?? 'Sem nome'} <br />
                   <span className="text-xs text-muted-foreground">
-                    {orcamento.filialId?.cnpjCpf
-                      ? formatDocumento(orcamento.filialId.cnpjCpf)
+                    {orcamento.clienteId?.cnpjCpf
+                      ? formatDocumento(orcamento.clienteId.cnpjCpf)
                       : 'Sem CNPJ'}
                   </span>
                 </TableCell>

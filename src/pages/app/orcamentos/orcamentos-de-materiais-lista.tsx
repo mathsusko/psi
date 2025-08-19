@@ -23,12 +23,12 @@ export function OrcamentoDeMateriaisLista() {
   const [selectedOrcamento, setSelectedOrcamento] = useState<any | null>(null)
   const [loadingOrcamentoId, setLoadingOrcamentoId] = useState<string | null>(null)
   const [searchParams] = useSearchParams()
-  const filialId = searchParams.get('filialId')
+  const clienteId = searchParams.get('clienteId')
 
   useEffect(() => {
     async function fetchOrcamentos() {
       try {
-        const params = filialId ? { filialId } : {}
+        const params = clienteId ? { clienteId } : {}
         const data = await getAllOrcamentos(params)
         setOrcamentos(data)
       } catch (err) {
@@ -37,7 +37,7 @@ export function OrcamentoDeMateriaisLista() {
     }
 
     fetchOrcamentos()
-  }, [filialId])
+  }, [clienteId])
 
   const handleDownload = async (id: string) => {
     try {
@@ -62,7 +62,7 @@ export function OrcamentoDeMateriaisLista() {
       console.error('Erro ao excluir orçamento:', error)
       alert('Erro ao excluir. Tente novamente.')
     }
-  }
+  } 
 
   const formatDate = (dateStr: string) => {
     return new Intl.DateTimeFormat('pt-BR').format(new Date(dateStr))
@@ -85,7 +85,7 @@ export function OrcamentoDeMateriaisLista() {
   return (
     <>
       <Helmet title="Orçamentos" />
-
+                                                                                                                 
       <div className="flex items-center justify-between p-4 rounded-xl bg-sidebar text-sidebar-foreground">
         <h1 className="text-sm font-bold tracking-tight">Orçamentos de materiais</h1>
         <NavLink to="/gerar-orcamento-materiais">
@@ -98,7 +98,7 @@ export function OrcamentoDeMateriaisLista() {
           </Button>
         </NavLink>
       </div>
-
+      
       <div className="flex flex-col gap-4 p-4 space-y-2.5 rounded-xl bg-sidebar text-sidebar-foreground">
         <form className="flex items-center gap-2">
           <span className="text-sm font-semibold">Filtros:</span>
@@ -124,10 +124,10 @@ export function OrcamentoDeMateriaisLista() {
               <TableRow key={orcamento._id}>
                 <TableCell>{formatDate(orcamento.createdAt)}</TableCell>
                 <TableCell>
-                  {orcamento.filialId?.nomeEmpresa ?? 'Sem nome'} <br />
+                  {orcamento.clienteId?.nomeEmpresa ?? 'Sem nome'} <br />
                   <span className="text-xs text-muted-foreground">
-                    {orcamento.filialId?.cnpjCpf
-                      ? formatDocumento(orcamento.filialId.cnpjCpf)
+                    {orcamento.clienteId?.cnpjCpf
+                      ? formatDocumento(orcamento.clienteId.cnpjCpf)
                       : 'Sem CNPJ'}
                   </span>
                 </TableCell>
@@ -147,7 +147,7 @@ export function OrcamentoDeMateriaisLista() {
                         <Download size={20} />
                       )}
                     </button>
-
+                    
                     <button
                       onClick={() => handleDelete(orcamento._id)}
                       className="text-red-600 hover:text-red-800"
@@ -171,14 +171,14 @@ export function OrcamentoDeMateriaisLista() {
                           )
                         }
                       </PDFDownloadLink>
-                    )}
+                    )}                    
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ))}             
           </TableBody>
         </Table>
       </div>
-    </>
+    </>               
   )
 }
